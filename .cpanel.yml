@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home3/administrador/public_html/info042026/projetopsi/
+    - export DEPLOYPATH=/home3/administrador/public_html/info042026/projetopsi-site/
     - /bin/cp index.html $DEPLOYPATH
