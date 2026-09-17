@@ -1,0 +1,135 @@
+/* ============================================================
+   PÁGINA: consultasCli (Minhas consultas)
+   Depende de: /site/assets/css/variaveis.css
+              /site/assets/css/componentes.css
+   (ambos devem ser carregados antes deste arquivo)
+   ============================================================ */
+
+.tituloConsultas {
+  margin: 0 0 var(--espacamentoLg) 0;
+  padding-bottom: var(--espacamentoMd);
+  border-bottom: 1px solid var(--corBorda);
+  font-weight: 700;
+}
+
+.gradeConsultas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--espacamentoLg);
+}
+
+@media (min-width: 768px) {
+  .gradeConsultas {
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+  }
+}
+
+
+.cartaoConsulta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacamentoSm);
+  padding: var(--espacamentoLg);
+  border: 1px solid var(--corBorda);
+  border-radius: 12px;
+  background-color: var(--corBranco);
+}
+
+.tituloConsulta {
+  margin: 0;
+  font-size: var(--fonteTamanhoH3);
+  font-weight: 700;
+  text-align: center;
+}
+
+.linhaConsulta {
+  font-weight: 700;
+}
+
+.profissionalConsulta,
+.clinicaConsulta {
+  margin: 0;
+}
+
+.rodapeConsulta {
+  margin-top: var(--espacamentoSm);
+  flex-wrap: wrap;
+  gap: var(--espacamentoSm);
+}
+
+
+.badgeStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacamentoXs);
+  border: none;
+  font-weight: 700;
+  font-size: var(--fonteTamanhoBody);
+  padding: var(--espacamentoSm) var(--espacamentoXl);
+  color: var(--corBranco);
+  cursor: pointer;
+}
+
+.badgeStatusPendente {
+  background-color: var(--corStatusPendencia);
+  color: var(--corTexto);
+}
+
+.badgeStatusAgendada {
+  background-color: var(--corDestaque);
+}
+
+.badgeStatusCancelada {
+  background-color: var(--corErro);
+  opacity: 0.85;
+}
+
+
+.cartaoConsultaEsqueleto .tituloConsulta,
+.cartaoConsultaEsqueleto .dataHoraConsulta,
+.cartaoConsultaEsqueleto .precoConsulta,
+.cartaoConsultaEsqueleto .profissionalConsulta,
+.cartaoConsultaEsqueleto .clinicaConsulta,
+.cartaoConsultaEsqueleto .botaoCancelar,
+.cartaoConsultaEsqueleto .badgeStatus {
+  color: transparent;
+  border-radius: 4px;
+  background-image: linear-gradient(
+    90deg,
+    #C5EED3 25%,
+    #DFF7E6 50%,
+    #C5EED3 75%
+  );
+  background-size: 200% 100%;
+  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
+}
+
+
+.estadoVazioConsultas {
+  padding: var(--espacamentoXl) var(--espacamentoMd);
+  text-align: center;
+}
+
+.iconeEstadoVazio {
+  font-size: 96px;
+  color: var(--corBorda);
+}
+
+.textoEstadoVazio {
+  margin-top: var(--espacamentoMd);
+  font-size: var(--fonteTamanhoBody);
+}
+
+
+.acoesModalConfirmacao .botaoSecundario,
+.acoesModalConfirmacao .botaoCancelar {
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .acoesModalConfirmacao .botaoSecundario,
+  .acoesModalConfirmacao .botaoCancelar {
+    width: auto;
+  }
+}

@@ -1,0 +1,82 @@
+/* ============================================================
+   VARIÁVEIS GLOBAIS DE DESIGN
+   Compartilhadas por todas as telas do projeto (infoServico,
+   agendamentoCli, consultasCli). Não duplicar estes valores
+   em outros arquivos CSS — sempre referenciar via var(--nome).
+   ============================================================ */
+
+:root {
+  /* ---------- Paleta de cores ---------- */
+  --corFundo: #D2FFE1;             /* Fundo */
+  --corBotaoPrincipal: #60CB84;    /* Botão principal */
+  --corDestaque: #26974C;          /* Destaque / estado "Agendado" */
+  --corTexto: #374151;             /* Texto */
+  --corBorda: #0D2B17;             /* Borda */
+  --corBotaoSecundario: #3B82F6;   /* Botão/ação secundária (usado nos links) */
+  --corStatusPendencia: #F59E0B;   /* Status de pendência */
+  --corErro: #DC2626;              /* Erro / Cancelar */
+  --corBranco: #FFFFFF;
+
+  /* ---------- Skeleton (estado de carregamento) ---------- */
+  --corEsqueletoClara: #C5EED3;
+  --corEsqueletoEscura: #DFF7E6;
+
+  /* ---------- Tipografia: tamanhos (Mobile — padrão/mobile-first) ---------- */
+  --fonteTamanhoH1: 32px;
+  --fonteTamanhoH2: 24px;
+  --fonteTamanhoH3: 20px;
+  --fonteTamanhoBody: 16px;
+  --fonteTamanhoSmall: 14px;
+  --fonteTamanhoCaption: 12px;
+
+  /* ---------- Espaçamentos base (px) ---------- */
+  --espacamentoXs: 4px;
+  --espacamentoSm: 8px;
+  --espacamentoMd: 16px;
+  --espacamentoLg: 24px;
+  --espacamentoXl: 32px;
+
+  /* ---------- Layout fixo ---------- */
+  --alturaCabecalhoMobile: 64px;
+  --alturaNavegacaoInferior: 72px;
+  --larguraNavegacaoLateral: 96px;
+
+  /* ---------- Fonte ---------- */
+  --fonteFamilia: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* ---------- Tipografia: tamanhos (Desktop) ----------
+   Breakpoint alinhado ao "md" do Bootstrap (768px),
+   já usado nas classes d-md-* do HTML. */
+@media (min-width: 768px) {
+  :root {
+    --fonteTamanhoH1: 48px;
+    --fonteTamanhoH2: 36px;
+    --fonteTamanhoH3: 28px;
+    --fonteTamanhoBody: 20px;
+    --fonteTamanhoSmall: 18px;
+    --fonteTamanhoCaption: 16px;
+  }
+}
+
+/* ---------- Reset/base mínimo ---------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fonteFamilia);
+  font-size: var(--fonteTamanhoBody);
+  color: var(--corTexto);
+  background-color: var(--corFundo);
+}
+
+h1 { font-size: var(--fonteTamanhoH1); }
+h2 { font-size: var(--fonteTamanhoH2); }
+h3 { font-size: var(--fonteTamanhoH3); }
+
+small,
+.textoCaption {
+  font-size: var(--fonteTamanhoCaption);
+}

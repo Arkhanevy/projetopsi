@@ -1,0 +1,337 @@
+/* ============================================================
+   PÁGINA: agendamentoCli (Agendamento)
+   Depende de: /site/assets/css/variaveis.css
+              /site/assets/css/componentes.css
+   (ambos devem ser carregados antes deste arquivo)
+
+   Este arquivo contém SOMENTE o que é específico desta página:
+   grid do formulário, calendário customizado e dropdowns.
+   Navegação, botões e modal padrão estão em componentes.css.
+   ============================================================ */
+
+
+.gradeAgendamento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--espacamentoLg);
+  max-width: 1200px;
+  margin: 0 auto;
+  grid-template-areas:
+    "titulo"
+    "alerta"
+    "valor"
+    "profissional"
+    "localizacao"
+    "calendario"
+    "horario"
+    "botoes";
+}
+
+@media (min-width: 768px) {
+  .gradeAgendamento {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    grid-template-areas:
+      "titulo       titulo"
+      "alerta       alerta"
+      "calendario   valor"
+      "calendario   profissional"
+      "calendario   localizacao"
+      "calendario   horario"
+      "calendario   botoes";
+  }
+}
+
+.areaTitulo { grid-area: titulo; }
+.areaAlerta { grid-area: alerta; }
+.areaValor { grid-area: valor; }
+.areaProfissional { grid-area: profissional; }
+.areaLocalizacao { grid-area: localizacao; }
+.areaCalendario { grid-area: calendario; }
+.areaHorario { grid-area: horario; }
+.areaBotoes { grid-area: botoes; }
+
+.tituloAgendamento {
+  margin: 0;
+  font-weight: 700;
+}
+
+.campoValorLinha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacamentoMd);
+}
+
+.valorAgendamento {
+  margin: 0;
+  padding: var(--espacamentoXs) var(--espacamentoMd);
+  border: 1px solid var(--corBorda);
+  border-radius: 8px;
+  background-color: var(--corBranco);
+  font-weight: 700;
+}
+
+.textoAjuda {
+  margin: var(--espacamentoXs) 0 0 0;
+  font-size: var(--fonteTamanhoCaption);
+  font-weight: 700;
+}
+
+.campoFormulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacamentoXs);
+}
+
+.tituloCampo {
+  display: block;
+  font-size: var(--fonteTamanhoH3);
+  font-weight: 700;
+  margin: 0 0 var(--espacamentoXs) 0;
+}
+
+.inputFormulario {
+  width: 100%;
+  padding: var(--espacamentoSm) var(--espacamentoMd);
+  border: 1px solid var(--corBorda);
+  border-radius: 8px;
+  background-color: var(--corBranco);
+  color: var(--corTexto);
+  font-size: var(--fonteTamanhoBody);
+}
+
+.inputFormulario[readonly] {
+  background-color: var(--corFundo);
+}
+
+
+.dropdownCustomizado {
+  position: relative;
+}
+
+.dropdownCustomizadoBotao {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--espacamentoSm);
+  padding: var(--espacamentoSm) var(--espacamentoMd);
+  border: 1px solid var(--corBorda);
+  border-radius: 8px;
+  background-color: var(--corBranco);
+  color: var(--corTexto);
+  font-size: var(--fonteTamanhoBody);
+  cursor: pointer;
+}
+
+.dropdownCustomizadoBotao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropdownCustomizadoTexto {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdownCustomizadoSeta {
+  transition: transform 0.15s ease-in-out;
+}
+
+.dropdownCustomizadoBotao[aria-expanded="true"] .dropdownCustomizadoSeta {
+  transform: rotate(180deg);
+}
+
+.dropdownCustomizadoLista {
+  position: absolute;
+  top: calc(100% + var(--espacamentoXs));
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--espacamentoXs) 0;
+  list-style: none;
+  border: 1px solid var(--corBorda);
+  border-radius: 8px;
+  background-color: var(--corBranco);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdownCustomizadoLista[hidden] {
+  display: none;
+}
+
+.dropdownCustomizadoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacamentoSm);
+  width: 100%;
+  padding: var(--espacamentoSm) var(--espacamentoMd);
+  border: none;
+  background-color: transparent;
+  color: var(--corTexto);
+  font-size: var(--fonteTamanhoBody);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdownCustomizadoItem:hover,
+.dropdownCustomizadoItem:focus-visible {
+  background-color: var(--corFundo);
+}
+
+.calendarioAgendamento {
+  padding: var(--espacamentoMd);
+  border: 1px solid var(--corBorda);
+  border-radius: 12px;
+  background-color: var(--corBranco);
+}
+
+
+.calendarioAgendamento.campoComErro {
+  color: inherit;
+}
+
+.calendarioCabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacamentoMd);
+  margin-bottom: var(--espacamentoMd);
+}
+
+.calendarioBotaoNavegacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--corDestaque);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--corDestaque);
+  cursor: pointer;
+}
+
+.calendarioBotaoNavegacao:hover {
+  background-color: var(--corBotaoPrincipal);
+  color: var(--corBranco);
+}
+
+.calendarioTitulo {
+  min-width: 140px;
+  margin: 0;
+  font-size: var(--fonteTamanhoH3);
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.calendarioDiasSemana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--espacamentoXs);
+  margin-bottom: var(--espacamentoSm);
+  font-weight: 700;
+  text-align: center;
+}
+
+.calendarioGrade {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--espacamentoXs);
+  margin-bottom: var(--espacamentoMd);
+}
+
+.diaCalendario {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--corTexto);
+  font-size: var(--fonteTamanhoBody);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.diaCalendario.diaVazio {
+  visibility: hidden;
+  cursor: default;
+}
+
+.diaCalendario.diaIndisponivel {
+  border-color: var(--corErro);
+  color: var(--corErro);
+  cursor: not-allowed;
+}
+
+.diaCalendario.diaSelecionado {
+  background-color: var(--corBotaoSecundario);
+  border-color: var(--corBotaoSecundario);
+  color: var(--corBranco);
+}
+
+
+@media (max-width: 400px) {
+  .calendarioAgendamento {
+    padding: var(--espacamentoSm);
+  }
+
+  .calendarioGrade,
+  .calendarioDiasSemana {
+    gap: 2px;
+  }
+}
+
+.calendarioLegenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacamentoMd);
+}
+
+.legendaItem {
+  display: flex;
+  align-items: center;
+  gap: var(--espacamentoXs);
+  margin: 0;
+  font-size: var(--fonteTamanhoSmall);
+  font-weight: 700;
+}
+
+.legendaAmostra {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.legendaAmostraSelecionado {
+  background-color: var(--corBotaoSecundario);
+}
+
+.legendaAmostraIndisponivel {
+  border: 2px solid var(--corErro);
+  background-color: transparent;
+}
+
+
+.acoesFormulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacamentoMd);
+}
+
+@media (min-width: 768px) {
+  .acoesFormulario {
+    justify-content: flex-end;
+  }
+}

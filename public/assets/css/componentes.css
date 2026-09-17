@@ -1,0 +1,402 @@
+/* ============================================================
+   COMPONENTES COMPARTILHADOS
+   Usado por todas as páginas (infoServico, agendamentoCli,
+   consultasCli). Depende de: variaveis.css (deve ser carregado
+   antes deste arquivo).
+
+   Contém: navegação (lateral/topo/inferior), botão voltar,
+   botões de ação padrão, modal padrão (+ variantes), área de
+   conteúdo e estado de carregamento (skeleton).
+   ============================================================ */
+
+.linkPularConteudo {
+  position: absolute;
+  top: -48px;
+  left: 8px;
+  z-index: 2000;
+  padding: var(--espacamentoSm) var(--espacamentoMd);
+  background-color: var(--corBranco);
+  color: var(--corTexto);
+  border: 2px solid var(--corDestaque);
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: top 0.15s ease-in-out;
+}
+
+.linkPularConteudo:focus {
+  top: 8px;
+}
+
+
+.navegacaoLateral {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--larguraNavegacaoLateral);
+  background-color: var(--corBotaoPrincipal);
+  padding: var(--espacamentoLg) 0;
+  z-index: 1030;
+}
+
+.marcaApp {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--espacamentoXl);
+}
+
+.logoApp {
+  width: 48px;
+  height: 48px;
+}
+
+.listaNavegacao {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.itemNavegacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  border-radius: 999px;
+  color: var(--corBranco);
+  text-decoration: none;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.itemNavegacao:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.itemNavegacaoAtivo {
+  background-color: var(--corBranco);
+  color: var(--corDestaque);
+}
+
+.itemNavegacaoAtivo:hover {
+  background-color: var(--corBranco);
+}
+
+
+.cabecalhoMobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--alturaCabecalhoMobile);
+  padding: 0 var(--espacamentoMd);
+  background-color: var(--corBotaoPrincipal);
+  z-index: 1030;
+}
+
+.marcaAppMobile {
+  text-decoration: none;
+  color: var(--corTexto);
+}
+
+.logoAppMobile {
+  width: 32px;
+  height: 32px;
+}
+
+.nomeApp {
+  font-size: var(--fonteTamanhoH3);
+  font-weight: 700;
+  color: var(--corTexto);
+}
+
+.botaoMenuMobile {
+  border: none;
+  background: transparent;
+  color: var(--corTexto);
+  padding: var(--espacamentoXs);
+}
+
+
+.navegacaoInferior {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--alturaNavegacaoInferior);
+  background-color: var(--corBotaoPrincipal);
+  padding: 0 var(--espacamentoMd);
+  z-index: 1030;
+}
+
+.itemNavegacaoInferior {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  color: var(--corBranco);
+  text-decoration: none;
+}
+
+.itemNavegacaoInferiorAtivo {
+  background-color: var(--corBranco);
+  color: var(--corDestaque);
+  transform: translateY(-8px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+
+
+.areaConteudo {
+  padding-top: calc(var(--alturaCabecalhoMobile) + var(--espacamentoMd));
+  padding-bottom: calc(var(--alturaNavegacaoInferior) + var(--espacamentoMd));
+}
+
+@media (min-width: 768px) {
+  .areaConteudo {
+    margin-left: var(--larguraNavegacaoLateral);
+    padding-top: var(--espacamentoLg);
+    padding-bottom: var(--espacamentoLg);
+  }
+}
+
+.conteudoPagina {
+  padding-left: var(--espacamentoMd);
+  padding-right: var(--espacamentoMd);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+.botaoVoltar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--corDestaque);
+  background-color: transparent;
+  color: var(--corDestaque);
+  margin-bottom: var(--espacamentoLg);
+}
+
+.botaoVoltar:hover {
+  background-color: var(--corBotaoPrincipal);
+}
+
+
+.botaoPrimario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacamentoXs);
+  background-color: var(--corBotaoPrincipal);
+  color: var(--corBranco);
+  border: none;
+  font-weight: 700;
+  font-size: var(--fonteTamanhoBody);
+  padding: var(--espacamentoSm) var(--espacamentoXl);
+}
+
+.botaoPrimario:hover {
+  background-color: var(--corDestaque);
+  color: var(--corBranco);
+}
+
+.botaoPrimario:disabled {
+  background-color: var(--corBotaoPrincipal);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.botaoCancelar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacamentoXs);
+  background-color: var(--corErro);
+  color: var(--corBranco);
+  border: none;
+  font-weight: 700;
+  font-size: var(--fonteTamanhoBody);
+  padding: var(--espacamentoSm) var(--espacamentoXl);
+  opacity: 0.85;
+}
+
+.botaoCancelar:hover {
+  opacity: 1;
+  color: var(--corBranco);
+}
+
+.botaoSecundario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacamentoXs);
+  background-color: var(--corBotaoSecundario);
+  color: var(--corBranco);
+  border: none;
+  font-weight: 700;
+  font-size: var(--fonteTamanhoBody);
+  padding: var(--espacamentoSm) var(--espacamentoXl);
+}
+
+.botaoSecundario:hover {
+  opacity: 0.9;
+  color: var(--corBranco);
+}
+
+
+.popover {
+  --bs-popover-max-width: 260px;
+  --bs-popover-border-width: 2px;
+  --bs-popover-border-color: var(--corBorda);
+  --bs-popover-bg: var(--corFundo);
+  --bs-popover-header-bg: var(--corFundo);
+  --bs-popover-header-color: var(--corTexto);
+  --bs-popover-body-color: var(--corTexto);
+  --bs-popover-body-padding-x: var(--espacamentoMd);
+  --bs-popover-body-padding-y: var(--espacamentoSm);
+}
+
+.popover-header {
+  font-weight: 700;
+  border-bottom: 1px solid var(--corBorda);
+}
+
+
+.modalPadrao .modal-content {
+  background-color: var(--corFundo);
+  border: 2px solid var(--corBorda);
+  border-radius: 16px;
+  padding: var(--espacamentoLg);
+  position: relative;
+}
+
+.tituloModal {
+  font-weight: 700;
+  margin-bottom: var(--espacamentoMd);
+}
+
+.textoModal {
+  font-size: var(--fonteTamanhoBody);
+  margin-bottom: var(--espacamentoMd);
+}
+
+.textoRodapeModal {
+  font-size: var(--fonteTamanhoCaption);
+  margin-top: var(--espacamentoMd);
+  margin-bottom: 0;
+}
+
+.linkTexto {
+  color: var(--corBotaoSecundario);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+
+.iconeModal {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto var(--espacamentoMd) auto;
+  border: 1px solid var(--corBorda);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconeModalBase {
+  font-size: 56px;
+  color: var(--corBorda);
+}
+
+.iconeModalSobreposto {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 28px;
+  color: var(--corErro);
+  background-color: var(--corBranco);
+  border-radius: 999px;
+}
+
+
+.botaoFecharModal {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background-color: var(--corBranco);
+  border: 2px solid var(--corErro);
+  opacity: 1;
+}
+
+
+.alertaValidacao {
+  background-color: var(--corErro);
+  color: var(--corBranco);
+  border: 2px solid var(--corBorda);
+  border-radius: 12px;
+  padding: var(--espacamentoMd);
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: var(--espacamentoLg);
+}
+
+
+.campoComErro {
+  border-color: var(--corErro) !important;
+  color: var(--corErro);
+}
+
+
+@keyframes animacaoEsqueleto {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.estadoCarregando img[data-campo] {
+  background-color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    var(--corEsqueletoClara) 25%,
+    var(--corEsqueletoEscura) 50%,
+    var(--corEsqueletoClara) 75%
+  );
+  background-size: 200% 100%;
+  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
+}
+
+.estadoCarregando [data-campo]:not(img) {
+  color: transparent;
+  border-radius: 4px;
+  background-image: linear-gradient(
+    90deg,
+    var(--corEsqueletoClara) 25%,
+    var(--corEsqueletoEscura) 50%,
+    var(--corEsqueletoClara) 75%
+  );
+  background-size: 200% 100%;
+  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
+}
+
+.estadoCarregando .botaoPrimario {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+.estadoErro img[data-campo],
+.estadoErro [data-campo]:not(img) {
+  color: transparent;
+  background-color: var(--corEsqueletoClara);
+  background-image: none;
+  animation: none;
+}

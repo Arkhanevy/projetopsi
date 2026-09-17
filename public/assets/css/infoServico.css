@@ -1,0 +1,345 @@
+
+.navegacaoLateral {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--larguraNavegacaoLateral);
+  background-color: var(--corBotaoPrincipal);
+  padding: var(--espacamentoLg) 0;
+  z-index: 1030;
+}
+
+.marcaApp {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--espacamentoXl);
+}
+
+.logoApp {
+  width: 48px;
+  height: 48px;
+}
+
+.listaNavegacao {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.itemNavegacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  border-radius: 999px;
+  color: var(--corBranco);
+  text-decoration: none;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.itemNavegacao:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.itemNavegacaoAtivo {
+  background-color: var(--corBranco);
+  color: var(--corDestaque);
+}
+
+.itemNavegacaoAtivo:hover {
+  background-color: var(--corBranco);
+}
+
+
+.cabecalhoMobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--alturaCabecalhoMobile);
+  padding: 0 var(--espacamentoMd);
+  background-color: var(--corBotaoPrincipal);
+  z-index: 1030;
+}
+
+.marcaAppMobile {
+  text-decoration: none;
+  color: var(--corTexto);
+}
+
+.logoAppMobile {
+  width: 32px;
+  height: 32px;
+}
+
+.nomeApp {
+  font-size: var(--fonteTamanhoH3);
+  font-weight: 700;
+  color: var(--corTexto);
+}
+
+.botaoMenuMobile {
+  border: none;
+  background: transparent;
+  color: var(--corTexto);
+  padding: var(--espacamentoXs);
+}
+
+
+.navegacaoInferior {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--alturaNavegacaoInferior);
+  background-color: var(--corBotaoPrincipal);
+  padding: 0 var(--espacamentoMd);
+  z-index: 1030;
+}
+
+.itemNavegacaoInferior {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  color: var(--corBranco);
+  text-decoration: none;
+}
+
+.itemNavegacaoInferiorAtivo {
+  background-color: var(--corBranco);
+  color: var(--corDestaque);
+  transform: translateY(-8px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.areaConteudo {
+  padding-top: calc(var(--alturaCabecalhoMobile) + var(--espacamentoMd));
+  padding-bottom: calc(var(--alturaNavegacaoInferior) + var(--espacamentoMd));
+}
+
+@media (min-width: 768px) {
+  .areaConteudo {
+    margin-left: var(--larguraNavegacaoLateral);
+    padding-top: var(--espacamentoLg);
+    padding-bottom: var(--espacamentoLg);
+  }
+}
+
+.conteudoDetalheServico {
+  padding-left: var(--espacamentoMd);
+  padding-right: var(--espacamentoMd);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.botaoVoltar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--corDestaque);
+  background-color: transparent;
+  color: var(--corDestaque);
+  margin-bottom: var(--espacamentoLg);
+}
+
+.botaoVoltar:hover {
+  background-color: var(--corBotaoPrincipal);
+}
+
+.figuraServico {
+  margin: 0;
+}
+
+.imagemServico {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  border: 1px solid var(--corBorda);
+  border-radius: 12px;
+}
+
+.infoServico {
+  gap: var(--espacamentoSm);
+}
+
+.rotuloProfissional {
+  font-weight: 700;
+}
+
+.nomeProfissional {
+  font-size: var(--fonteTamanhoSmall);
+  font-weight: 700;
+  margin: 0;
+}
+
+.tituloServico {
+  margin: 0 0 var(--espacamentoSm) 0;
+  font-weight: 700;
+}
+
+.detalhesServico {
+  font-size: var(--fonteTamanhoBody);
+  font-weight: 700;
+  margin-bottom: var(--espacamentoMd);
+}
+
+.tituloSecao {
+  margin: 0 0 var(--espacamentoSm) 0;
+  font-weight: 700;
+}
+
+.descricaoServico {
+  margin-bottom: var(--espacamentoLg);
+}
+
+.textoDescricao {
+  border: 1px solid var(--corBorda);
+  border-radius: 8px;
+  padding: var(--espacamentoMd);
+  margin: 0;
+  font-size: var(--fonteTamanhoBody);
+}
+
+@keyframes animacaoEsqueleto {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.estadoCarregando .imagemServico {
+  background-color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    #C5EED3 25%,
+    #DFF7E6 50%,
+    #C5EED3 75%
+  );
+  background-size: 200% 100%;
+  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
+}
+
+.estadoCarregando [data-campo]:not(img) {
+  color: transparent;
+  border-radius: 4px;
+  background-image: linear-gradient(
+    90deg,
+    #C5EED3 25%,
+    #DFF7E6 50%,
+    #C5EED3 75%
+  );
+  background-size: 200% 100%;
+  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
+}
+
+.estadoCarregando .botaoAgendarAgora {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Quando a busca falha: mantém os blocos neutros, mas sem
+   animação, para não distrair atrás do modal de erro. */
+.estadoErro .imagemServico,
+.estadoErro [data-campo]:not(img) {
+  color: transparent;
+  background-color: #C5EED3;
+  background-image: none;
+  animation: none;
+}
+
+.botaoAgendarAgora,
+.botaoTentarNovamente {
+  background-color: var(--corBotaoPrincipal);
+  color: var(--corBranco);
+  border: none;
+  font-weight: 700;
+  font-size: var(--fonteTamanhoBody);
+  padding: var(--espacamentoSm) var(--espacamentoXl);
+  align-self: flex-start;
+}
+
+.botaoAgendarAgora:hover,
+.botaoTentarNovamente:hover {
+  background-color: var(--corDestaque);
+  color: var(--corBranco);
+}
+
+.botaoAgendarAgora:disabled {
+  background-color: var(--corBotaoPrincipal);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modalPadrao .modal-content {
+  background-color: var(--corFundo);
+  border: 2px solid var(--corBorda);
+  border-radius: 16px;
+  padding: var(--espacamentoLg);
+  position: relative;
+}
+
+.tituloModal {
+  font-weight: 700;
+  margin-bottom: var(--espacamentoMd);
+}
+
+.textoModal {
+  font-size: var(--fonteTamanhoBody);
+  margin-bottom: var(--espacamentoMd);
+}
+
+.textoRodapeModal {
+  font-size: var(--fonteTamanhoCaption);
+  margin-top: var(--espacamentoMd);
+  margin-bottom: 0;
+}
+
+.linkTexto {
+  color: var(--corBotaoSecundario);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.iconeModalErro {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto var(--espacamentoMd) auto;
+  border: 1px solid var(--corBorda);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconeModalErroBase {
+  font-size: 56px;
+  color: var(--corBorda);
+}
+
+.iconeModalErroSobreposto {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 28px;
+  color: var(--corErro);
+  background-color: var(--corBranco);
+  border-radius: 999px;
+}
+
+.botaoFecharModal {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background-color: var(--corBranco);
+  border: 2px solid var(--corErro);
+  opacity: 1;
+}
