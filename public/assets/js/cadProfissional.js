@@ -1,524 +1,436 @@
-$(document).ready(function () {
-    const telas = {
+console.log("JS cadProfissional carregado");
+/* ============================================================
+   PÁGINA: cadProfissional (Cadastro / Login / Ativação do Profissional)
+   Depende de: jQuery, Bootstrap 5 (bundle JS), ElmoUtilitarios
+   (ver /assets/js/utilitarios.js — deve ser carregado antes deste arquivo)
+
+   Responsabilidades deste arquivo:
+   - Alternar entre as telas de cadastro, login, ativação e perfil
+     do profissional.
+   - Preencher automaticamente o endereço a partir do CEP (ViaCEP).
+   - Validar e enviar o formulário de cadastro via AJAX (com upload
+     da imagem de perfil).
+   - Gerar/reenviar o código de ativação por e-mail.
+   - Validar o código informado e ativar a conta.
+   - Validar e enviar o formulário de login.
+   ============================================================ */
+
+(function ($, Utilitarios) {
+  "use strict";
+
+  var moduloCadProfissional = {
+
+    /* ---------- Configuração ---------- */
+    configuracao: {
+      urlProfissional: "/z/index.php?uri=profissional", //Axolote
+      urlInfoServico: "index.php?uri=infoServico"
+    },
+
+    /* ---------- Estado interno ---------- */
+    estado: {
+      telaInicial: "cadastroProfissional",
+      codigoGerado: false
+    },
+
+    /* ---------- Referências de elementos (cacheadas) ---------- */
+    telas: {},
+    elementos: {},
+
+    /**
+     * Ponto de entrada. Deve ser chamado uma vez, quando o
+     * documento estiver pronto.
+     */
+    iniciar: function () {
+      this.urlElementos();
+
+      var el = this.elementos;
+      Utilitarios.configurarPreviewImagem(el.$alertContainer, el.$img, el.$preview);
+      Utilitarios.configurarCEP(el.$alertContainer, {
+        cep: el.$cep,
+        rua: el.$rua,
+        bairro: el.$bairro,
+        cidade: el.$cidade,
+        uf: el.$uf,
+        ibge: el.$ibge
+      });
+
+      this.registrarEventos();
+      this.mostrarTela(this.estado.telaInicial);
+    },
+
+    urlElementos: function () {
+      this.telas = {
         cadastroProfissional: $("#cadastroProfissional"),
         loginProfissional: $("#loginProfissional"),
         ativacao: $("#ativacao"),
         perfilUser: $("#perfilUser")
-    };
+      };
 
-    function mostrarTela(nomeTela) {
-        Object.values(telas).forEach(tela => tela.hide());
+      this.elementos.$alertContainer = $("#alertContainer");
 
-        if (telas[nomeTela]) {
-            telas[nomeTela].show();
-        } else {
-            console.warn("Tela não encontrada:", nomeTela);
-        }
-    }
+      this.elementos.$img = $("#img_perfil");
+      this.elementos.$preview = $("#preview");
+      this.elementos.$nome = $("#nomeProfissional");
+      this.elementos.$email = $("#emailCadastro");
+      this.elementos.$tel = $("#telProfissional");
+      this.elementos.$user = $("#userProfissional");
+      this.elementos.$genero = $("#generoProfissional");
+      this.elementos.$bio = $("#bioProfissional");
+      this.elementos.$data = $("#dtnPro");
+      this.elementos.$cpf = $("#CPF");
+      this.elementos.$senha = $("#senhaProfissional");
+      this.elementos.$cep = $("#cep");
+      this.elementos.$rua = $("#rua");
+      this.elementos.$bairro = $("#bairro");
+      this.elementos.$uf = $("#uf");
+      this.elementos.$ibge = $("#ibge");
+      this.elementos.$cidade = $("#cidade");
+      this.elementos.$registro = $("#registroProfissional");
+      this.elementos.$form = $("#cadastroProfissional");
 
-    mostrarTela("cadastroProfissional");
+      this.elementos.$loginEmail = $("#emailCadastroLog");
+      this.elementos.$loginSenha = $("#senhaProfissionalLog");
 
-    let geradoCod = false;
+      this.elementos.$emailAtivacao = $("#emailAtivar");
+      this.elementos.$codigo = $("#codigoCliente");
 
-    const BASE_URL = "<?= BASE_URL ?>";
+      this.elementos.$botaoCadastrar = $("#btnCadastrar");
+      this.elementos.$botaoLogar = $("#btnLogar");
+      this.elementos.$botaoCodigo = $("#btnCodigo");
+      this.elementos.$botaoAtivar = $("#btnAtivar");
+    },
 
-    //Objetos-Dados do profissional
-    const prof = {
-        img: $("#img_perfil"),
-        preview: $("#preview"),
-        nome: $("#nomeProfissional"),
-        email: $("#emailCadastro"),
-        tel: $("#telProfissional"),
-        user: $("#userProfissional"),
-        genero: $("#generoProfissional"),
-        bio: $("#bioProfissional"),
-        data: $("#dtnPro"),
-        cpf: $("#CPF"),
-        senha: $("#senhaProfissional"),
-        cep: $("#cep"),
-        rua: $("#rua"),
-        bairro: $("#bairro"),
-        uf: $("#uf"),
-        ibge: $("#ibge"),
-        cidade: $("#cidade"),
-        registro: $("#registroProfissional"),
-        form: $("#cadastroProfissional"),
-        login: $("#loginProfissional"),
-        loginEmail: $("#emailCadastroLog"),
-        loginSenha: $("#senhaProfissionalLog"),
-        emailAtivacao: $("#emailAtivar"),
-        codigo: $("#codigoCliente")
-    };
+    registrarEventos: function () {
+      var self = this;
 
-    //Funções
-    function mostrarAlert(mensagem, tipo = "success") {
-        const $container = $("#alertContainer");
+      // Troca de telas
+      $(".logarProfissional").on("click", function (evento) {
+        evento.preventDefault();
+        self.mostrarTela("loginProfissional");
+      });
 
-        const $alert = $(`
-            <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
-                ${mensagem}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `);
+      $(".cadastrarProfissional").on("click", function (evento) {
+        evento.preventDefault();
+        self.mostrarTela("cadastroProfissional");
+      });
 
-        $container.append($alert);
-
-        setTimeout(() => {
-            $alert.fadeOut(200, () => $alert.remove());
-        }, 3000);
-    }
-
-    function emailValido(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function apenasNumeros(v) {
-        return v.replace(/\D/g, "");
-    }
-
-    function validarCampos(campos) {
-        let erro = false;
-
-        campos.forEach(c => {
-            if (!c.valor) {
-                c.el.addClass("is-invalid");
-                erro = true;
-            }
-        });
-
-        return erro;
-    }
-
-    function cpfValido(cpf) {
-        cpf = cpf.replace(/\D/g, "");
-
-        if (cpf.length !== 11) return false;
-        if (/^(\d)\1+$/.test(cpf)) return false;// Elimina CPFs inválidos conhecidos
-
-        // Validação do primeiro dígito
-        let soma = 0;
-        for (let i = 0; i < 9; i++) {
-            soma += parseInt(cpf[i]) * (10 - i);
-        }
-
-        let resto = (soma * 10) % 11;
-        if (resto === 10 || resto === 11) resto = 0;
-
-        if (resto !== parseInt(cpf[9])) return false;
-
-        // Validação do segundo dígito
-        soma = 0;
-        for (let i = 0; i < 10; i++) {
-            soma += parseInt(cpf[i]) * (11 - i);
-        }
-
-        resto = (soma * 10) % 11;
-        if (resto === 10 || resto === 11) resto = 0;
-
-        return resto === parseInt(cpf[10]);
-    }
-
-    //IMG
-    function configurarPreview(input, preview) {
-
-        preview.on("click", () => input.trigger("click"));
-
-        input.on("change", function () {
-
-            const file = this.files[0];
-
-            if (!file || !file.type.startsWith("image/")) {
-                mostrarAlert("Selecione uma imagem válida!", "danger");
-                return;
-            }
-
-            const reader = new FileReader();
-
-            reader.onload = e => preview.attr("src", e.target.result);
-            reader.readAsDataURL(file);
-        });
-    }
-
-    //CEP
-    function configurarCEP(config) {
-
-        config.cep.on("blur", function () {
-
-            const cep = apenasNumeros($(this).val());
-
-            if (!/^[0-9]{8}$/.test(cep)) {
-                config.cep.addClass("is-invalid");
-                config.rua.addClass("is-invalid");
-                config.bairro.addClass("is-invalid");
-                config.cidade.addClass("is-invalid");
-                config.uf.addClass("is-invalid");
-                config.ibge.addClass("is-invalid");
-                mostrarAlert("CEP inválido!", "danger");
-                return;
-            }
-
-            config.rua.val("...");
-            config.bairro.val("...");
-            config.cidade.val("...");
-            config.uf.val("...");
-            config.ibge.val("...");
-
-            $.getJSON(`https://viacep.com.br/ws/${cep}/json/?callback=?`, function (dados) {
-
-                if (dados.erro) {
-                    mostrarAlert("CEP não encontrado!", "danger");
-                    config.cep.addClass("is-invalid");
-                    config.rua.addClass("is-invalid");
-                    config.bairro.addClass("is-invalid");
-                    config.cidade.addClass("is-invalid");
-                    config.uf.addClass("is-invalid");
-                    config.ibge.addClass("is-invalid");
-                    return;
-                } else {
-                    config.rua.val(dados.logradouro);
-                    config.bairro.val(dados.bairro);
-                    config.cidade.val(dados.localidade);
-                    config.uf.val(dados.uf);
-                    config.ibge.val(dados.ibge);
-                    config.cep.removeClass("is-invalid");
-                    config.rua.removeClass("is-invalid");
-                    config.bairro.removeClass("is-invalid");
-                    config.cidade.removeClass("is-invalid");
-                    config.uf.removeClass("is-invalid");
-                    config.ibge.removeClass("is-invalid");
-                    return;
-                }
-            });
-        });
-
-        config.cep.on("input", function () {
-            $(this).removeClass("is-invalid");
-        });
-    }
-
-    function marcarErro(campos, mensagem) {
-        campos.forEach(c => c.addClass("is-invalid"));
-        mostrarAlert(mensagem, "danger");
-    }
-
-    //Funções-Estrutura
-    configurarPreview(prof.img, prof.preview);
-
-    configurarCEP({
-        cep: prof.cep,
-        rua: prof.rua,
-        bairro: prof.bairro,
-        cidade: prof.cidade,
-        uf: prof.uf,
-        ibge: prof.ibge
-    });
-
-    $(document).on("input change", ".form-control, .form-select, textarea", function () {
+      // Remove o estado de erro assim que o usuário volta a interagir com o campo.
+      $(document).on("input change", ".form-control, .form-select, textarea", function () {
         $(this).removeClass("is-invalid");
-    });
+      });
 
-    //Troca de telas
-    $(".logarProfissional").on("click", function (e) {
-        e.preventDefault();
-        mostrarTela("loginProfissional");
-    });
+      this.elementos.$botaoCadastrar.on("click", function () {
+        self.enviarCadastro($(this));
+      });
 
-    $(".cadastrarProfissional").on("click", function (e) {
-        e.preventDefault();
-        mostrarTela("cadastroProfissional");
-    });
+      this.elementos.$botaoLogar.on("click", function (evento) {
+        evento.preventDefault();
+        self.enviarLogin($(this));
+      });
 
-    //CADASTRO PROFISSIONAL
-    $("#btnCadastrar").on("click", function () {
-        const btn = $(this);
-        btn.prop("disabled", true).html("Cadastrando...");
-        const campos = [
-            { valor: prof.nome.val(), el: prof.nome },
-            { valor: prof.tel.val(), el: prof.tel },
-            { valor: prof.user.val(), el: prof.user },
-            { valor: prof.bio.val(), el: prof.bio },
-            { valor: prof.data.val(), el: prof.data },
-            { valor: prof.registro.val(), el: prof.registro },
-            { valor: prof.senha.val(), el: prof.senha },
-            { valor: prof.genero.val(), el: prof.genero },
-            { valor: prof.email.val(), el: prof.email },
-            { valor: prof.cpf.val(), el: prof.cpf },
-            { valor: prof.cep.val(), el: prof.cep },
-            { valor: prof.rua.val(), el: prof.rua },
-            { valor: prof.bairro.val(), el: prof.bairro },
-            { valor: prof.uf.val(), el: prof.uf },
-            { valor: prof.ibge.val(), el: prof.ibge },
-            { valor: prof.cidade.val(), el: prof.cidade },
-        ];
+      this.elementos.$botaoCodigo.on("click", function (evento) {
+        evento.preventDefault();
+        self.gerarCodigo($(this));
+      });
 
-        if (validarCampos(campos)) {
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("Preencha todos os campos!", "danger");
-            return;
-        }
+      this.elementos.$botaoAtivar.on("click", function (evento) {
+        evento.preventDefault();
+        self.ativarConta($(this));
+      });
+    },
 
-        const cpf = prof.cpf.val().trim();
+    /* TELAS */
 
-        if (!cpf || !cpfValido(cpf)) {
-            prof.cpf.addClass("is-invalid");
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("CPF inválido!", "danger");
-            return;
-        }
+    mostrarTela: function (nomeTela) {
+      var self = this;
+      Object.keys(this.telas).forEach(function (chave) {
+        self.telas[chave].hide();
+      });
 
-        const email = prof.email.val().trim();
+      if (this.telas[nomeTela]) {
+        this.telas[nomeTela].show();
+      } else {
+        console.warn("Tela não encontrada:", nomeTela);
+      }
+    },
 
-        if (!email || !emailValido(email)) {
-            prof.email.addClass("is-invalid");
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("E-mail inválido!", "danger");
-            return;
-        }
+    /* ALERTAS */
 
-        const imgFile = prof.img[0].files[0];
-        if (!imgFile) {
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("A imagem de perfil é obrigatória.", "danger");
-            return;
-        }
+    mostrarAlert: function (mensagem, tipo) {
+      Utilitarios.mostrarAlerta(this.elementos.$alertContainer, mensagem, tipo);
+    },
 
-        // CEP
-        const camposEndereco = [
-            prof.cep,
-            prof.rua,
-            prof.bairro,
-            prof.uf,
-            prof.ibge,
-            prof.cidade
-        ];
+    /* CADASTRO */
 
-        if (apenasNumeros(prof.cep.val()).length !== 8) {
-            marcarErro(camposEndereco, "CEP inválido!");
-            btn.prop("disabled", false).html("Cadastrar");
-            return;
-        }
+    enviarCadastro: function ($botao) {
+      var self = this;
+      var el = this.elementos;
 
-        const cpfLimpo = prof.cpf.val().replace(/\D/g, "");
-        const CEPLimpo = prof.cep.val().replace(/\D/g, "");
+      $botao.prop("disabled", true).html("Cadastrando...");
 
-        const formData = new FormData();
-        formData.append("nome", prof.nome.val());
-        formData.append("email", prof.email.val());
-        formData.append("telefone", prof.tel.val());
-        formData.append("username", prof.user.val());
-        formData.append("bio", prof.bio.val());
-        formData.append("dtNas", prof.data.val());
-        formData.append("registro", prof.registro.val());
-        formData.append("senha", prof.senha.val());
-        formData.append("genero", prof.genero.val());
-        formData.append("CEP", CEPLimpo);
-        formData.append("CPF", cpfLimpo);
-        formData.append("acao", "cadastrar");
-        formData.append("cxproFoto", imgFile);
+      var campos = [
+        { valor: el.$nome.val(), el: el.$nome },
+        { valor: el.$tel.val(), el: el.$tel },
+        { valor: el.$user.val(), el: el.$user },
+        { valor: el.$bio.val(), el: el.$bio },
+        { valor: el.$data.val(), el: el.$data },
+        { valor: el.$registro.val(), el: el.$registro },
+        { valor: el.$senha.val(), el: el.$senha },
+        { valor: el.$genero.val(), el: el.$genero },
+        { valor: el.$email.val(), el: el.$email },
+        { valor: el.$cpf.val(), el: el.$cpf },
+        { valor: el.$cep.val(), el: el.$cep },
+        { valor: el.$rua.val(), el: el.$rua },
+        { valor: el.$bairro.val(), el: el.$bairro },
+        { valor: el.$uf.val(), el: el.$uf },
+        { valor: el.$ibge.val(), el: el.$ibge },
+        { valor: el.$cidade.val(), el: el.$cidade }
+      ];
 
-        $.ajax({
-            url: "/z/index.php?uri=profissional", //Axolote
-            method: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (r) {
-                btn.prop("disabled", false).html("Cadastrar");
+      if (Utilitarios.validarCampos(campos)) {
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("Preencha todos os campos!", "danger");
+        return;
+      }
 
-                if (r.trim() === "sucesso") {
-                    mostrarAlert("Cadastro realizado!", "success");
-                    mostrarTela("ativacao");
-                } else {
-                    mostrarAlert(r, "danger");
-                }
-            },
-            error: function () {
-                btn.prop("disabled", false).html("Cadastrar");
-                mostrarAlert("Erro na requisição!", "danger");
-            }
+      var cpf = el.$cpf.val().trim();
+      if (!cpf || !Utilitarios.cpfValido(cpf)) {
+        el.$cpf.addClass("is-invalid");
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("CPF inválido!", "danger");
+        return;
+      }
+
+      if (!Utilitarios.telefoneValido(el.$tel.val())) {
+        el.$tel.addClass("is-invalid");
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("Telefone inválido!", "danger");
+        return;
+      }
+
+      if (!Utilitarios.maiorDeIdade(el.$data.val(), 18)) {
+        el.$data.addClass("is-invalid");
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("Você precisa ser maior de 18 anos para se cadastrar!", "danger");
+        return;
+      }
+
+      var email = el.$email.val().trim();
+      if (!Utilitarios.emailValido(email)) {
+        el.$email.addClass("is-invalid");
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("E-mail inválido!", "danger");
+        return;
+      }
+
+      var imgArquivo = el.$img[0].files[0];
+      if (!imgArquivo) {
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("A imagem de perfil é obrigatória.", "danger");
+        return;
+      }
+
+      var camposEndereco = [el.$cep, el.$rua, el.$bairro, el.$uf, el.$ibge, el.$cidade];
+      if (Utilitarios.apenasNumeros(el.$cep.val()).length !== 8) {
+        Utilitarios.marcarCamposComErro(el.$alertContainer, camposEndereco, "CEP inválido!");
+        $botao.prop("disabled", false).html("Cadastrar");
+        return;
+      }
+
+      var cpfLimpo = Utilitarios.apenasNumeros(el.$cpf.val());
+      var cepLimpo = Utilitarios.apenasNumeros(el.$cep.val());
+
+      var formData = new FormData();
+      formData.append("nome", el.$nome.val());
+      formData.append("email", email);
+      formData.append("telefone", Utilitarios.apenasNumeros(el.$tel.val()));
+      formData.append("username", el.$user.val());
+      formData.append("bio", el.$bio.val());
+      formData.append("dtNas", el.$data.val());
+      formData.append("registro", el.$registro.val());
+      formData.append("senha", el.$senha.val());
+      formData.append("genero", el.$genero.val());
+      formData.append("CEP", cepLimpo);
+      formData.append("CPF", cpfLimpo);
+      formData.append("acao", "cadastrar");
+      formData.append("cxproFoto", imgArquivo);
+
+      $.ajax({
+        url: this.configuracao.urlProfissional,
+        method: "POST",
+        data: formData,
+        processData: false,
+        contentType: false
+      })
+        .done(function (resposta) {
+          $botao.prop("disabled", false).html("Cadastrar");
+          if ($.trim(resposta) === "sucesso") {
+            self.mostrarAlert("Cadastro realizado!", "success");
+            self.mostrarTela("ativacao");
+          } else {
+            self.mostrarAlert(resposta, "danger");
+          }
+        })
+        .fail(function () {
+          $botao.prop("disabled", false).html("Cadastrar");
+          self.mostrarAlert("Erro na requisição!", "danger");
         });
-    });
-    $("input").on("input", function () {
-        $(this).removeClass("is-invalid");
-    });
+    },
 
-    //LOGIN
-    $("#btnLogar").on("click", function (e) {
-        e.preventDefault();
-        const btn = $(this);
-        btn.prop("disabled", true).html("Logando...");
+    /* LOGIN */
 
-        const campos = [
-            { valor: prof.loginEmail.val(), el: prof.loginEmail },
-            { valor: prof.loginSenha.val(), el: prof.loginSenha }
-        ];
+    enviarLogin: function ($botao) {
+      var self = this;
+      var el = this.elementos;
 
-        if (validarCampos(campos)) {
-            btn.prop("disabled", false).html("Logar");
-            mostrarAlert("Preencha todos os campos!", "danger");
-            return;
-        }
+      $botao.prop("disabled", true).html("Logando...");
 
-        const email = prof.loginEmail.val().trim();
+      var campos = [
+        { valor: el.$loginEmail.val(), el: el.$loginEmail },
+        { valor: el.$loginSenha.val(), el: el.$loginSenha }
+      ];
 
-        if (!email || !emailValido(email)) {
-            prof.loginEmail.addClass("is-invalid");
-            btn.prop("disabled", false).html("Logar");
-            mostrarAlert("E-mail inválido!", "danger");
-            return;
-        }
+      if (Utilitarios.validarCampos(campos)) {
+        $botao.prop("disabled", false).html("Logar");
+        this.mostrarAlert("Preencha todos os campos!", "danger");
+        return;
+      }
 
-        const fd = new FormData();
-        fd.append("email", email);
-        //fd.append("senhaLog", prof.loginSenha); Maria
-		fd.append("senhaLog", prof.loginSenha.val()); //evelyn
-		fd.append("acao", "login");
+      var email = el.$loginEmail.val().trim();
+      if (!Utilitarios.emailValido(email)) {
+        el.$loginEmail.addClass("is-invalid");
+        $botao.prop("disabled", false).html("Logar");
+        this.mostrarAlert("E-mail inválido!", "danger");
+        return;
+      }
 
-        $.ajax({
-            url:"/z/index.php?uri=profissional", //Axolote
-            method: "POST",
-            data: fd,
-            processData: false,
-            contentType: false,
+      var fd = new FormData();
+      fd.append("email", email);
+      fd.append("senhaLog", el.$loginSenha.val());
+      fd.append("acao", "login");
 
-            success: function (resposta) {
-                console.log("Foi mandado");
-                btn.prop("disabled", false).html("Logar");
-                
-				if (resposta.trim() === "sucesso") {
-                    
-					mostrarAlert("Login realizado com sucesso!", "success");
-                    //mostrarTela("perfilUser"); -> Maria
-					//inicio evelyn
-					setTimeout(() => {
-					    window.location.href ="/z/index.php?uri=perfil";
-					}, 1000);
-					//fim evelyn
-                } else {
-                    mostrarAlert(resposta, "danger");
-                    //window.location.href = window.BASE_URL + "index.php?uri=clinica"; -> Maria
-                }
-            },
-
-            error: function (xhr, status, error) {
-                console.log("STATUS:", status);
-                console.log("ERRO:", error);
-                console.log("RESPOSTA:", xhr.responseText);
-                mostrarAlert("Erro na requisição!", "danger");
-            }
+      $.ajax({
+        url: this.configuracao.urlProfissional,
+        method: "POST",
+        data: fd,
+        processData: false,
+        contentType: false
+      })
+        .done(function (resposta) {
+          $botao.prop("disabled", false).html("Logar");
+          if ($.trim(resposta) === "sucesso") {
+            self.mostrarAlert("Login realizado com sucesso!", "success");
+            window.location.href = self.configuracao.urlInfoServico;
+          } else {
+            self.mostrarAlert(resposta, "danger");
+          }
+        })
+        .fail(function (xhr, status, erro) {
+          console.error("Erro no login:", status, erro, xhr.responseText);
+          self.mostrarAlert("Erro na requisição!", "danger");
         });
-    });
-    $("input").on("input", function () {
-        $(this).removeClass("is-invalid");
-    });
+    },
 
-    // GERAR CÓDIGO
-    $("#btnCodigo").on("click", function (e) {
-        e.preventDefault();
+    /* CÓDIGO DE ATIVAÇÃO */
 
-        const btn = $(this);
-        btn.prop("disabled", true);
+    gerarCodigo: function ($botao) {
+      var self = this;
 
-        let tempo = 60;
-        btn.text(`Aguarde ${tempo}s para gerar um novo código`);
+      $botao.prop("disabled", true);
 
-        const interval = setInterval(() => {
-            tempo--;
-            btn.text(`Aguarde ${tempo}s`);
-            if (tempo <= 0) {
-                clearInterval(interval);
-                btn.prop("disabled", false);
-                btn.text("Gerar código");
-            }
-        }, 1000);
+      var tempo = 60;
+      $botao.text("Aguarde " + tempo + "s para gerar um novo código");
 
-        const email = prof.email.val().trim();
-        const controller = "/z/index.php?uri=profissional"; //Axolote
-
-        const fd = new FormData();
-        fd.append("email", email);
-        fd.append("acao", "ReGerarCodigo");
-
-        $.ajax({
-            url: controller, //Axolote
-            method: "POST",
-            data: fd,
-            processData: false,
-            contentType: false,
-            success: function (resposta) {
-                if (resposta.trim() === "sucesso") {
-                    mostrarAlert("Código enviado com sucesso para o seu e-mail!", "success");
-                    geradoCod = true;
-                } else {
-                    mostrarAlert(resposta, "danger");
-                    mostrarAlert("Não gerado", "danger");
-                }
-            },
-            error: function () {
-                console.log("Erro na requisição ao gerar código!", "danger");
-            }
-        });
-    });
-
-    //ATIVACAO
-    $("#btnAtivar").on("click", function (e) {
-        e.preventDefault();
-
-        const btn = $(this);
-        const campoCodigo = $("#codigoCliente");
-        const inputCodigo = campoCodigo.val().trim();
-
-        const email = prof.email.val().trim();
-        const controller ="/z/index.php?uri=profissional"; //Axolote
-
-        if (geradoCod === false) {
-            mostrarAlert("Gere um código primeiro!", "danger");
-            btn.prop("disabled", false).html("Ativar");
-            return;
+      var intervalo = setInterval(function () {
+        tempo--;
+        $botao.text("Aguarde " + tempo + "s para gerar um novo código");
+        if (tempo <= 0) {
+          clearInterval(intervalo);
+          $botao.prop("disabled", false);
+          $botao.text("Gerar código");
         }
+      }, 1000);
 
-        if (!inputCodigo) {
-            campoCodigo.addClass("is-invalid");
-            mostrarAlert("Digite o código enviado!", "danger");
-            btn.prop("disabled", false).html("Ativar");
-            return;
-        }
+      var email = this.elementos.$email.val().trim();
 
-        btn.prop("disabled", true).html("Ativando...");
+      var fd = new FormData();
+      fd.append("email", email);
+      fd.append("acao", "ReGerarCodigo");
 
-        const fd = new FormData();
-        fd.append("email", email);
-        fd.append("codigo", inputCodigo);
-        fd.append("acao", "ativar");
-
-        $.ajax({
-            url: controller, //Axolote
-            method: "POST",
-            data: fd,
-            processData: false,
-            contentType: false,
-            success: function (resposta) {
-                btn.prop("disabled", false).html("Ativar");
-
-                if (resposta.trim() === "sucesso") {
-                    mostrarAlert("Conta ativada com sucesso!", "success");
-                    geradoCod = false;
-                    mostrarTela("loginProfissional");
-                } else {
-                    mostrarAlert(resposta, "danger");
-                    campoCodigo.addClass("is-invalid");
-                    btn.prop("disabled", false).html("Ativar");
-                }
-            },
-            error: function (xhr, status, error) {
-                btn.prop("disabled", false).html("Ativar");
-                console.error("Erro:", error);
-                mostrarAlert("Erro na requisição de ativação!", "danger");
-            }
+      $.ajax({
+        url: this.configuracao.urlProfissional,
+        method: "POST",
+        data: fd,
+        processData: false,
+        contentType: false
+      })
+        .done(function (resposta) {
+          if ($.trim(resposta) === "sucesso") {
+            self.mostrarAlert("Código enviado com sucesso para o seu e-mail!", "success");
+            self.estado.codigoGerado = true;
+          } else {
+            self.mostrarAlert(resposta, "danger");
+          }
+        })
+        .fail(function () {
+          console.error("Erro na requisição ao gerar código!");
         });
-    });
-    $("input").on("input", function () {
-        $(this).removeClass("is-invalid");
-    });
+    },
 
-});
+    ativarConta: function ($botao) {
+      var self = this;
+      var $campoCodigo = this.elementos.$codigo;
+      var codigoDigitado = $campoCodigo.val().trim();
+      var email = this.elementos.$email.val().trim();
+
+      if (!this.estado.codigoGerado) {
+        this.mostrarAlert("Gere um código primeiro!", "danger");
+        $botao.prop("disabled", false).html("Ativar");
+        return;
+      }
+
+      if (!codigoDigitado) {
+        $campoCodigo.addClass("is-invalid");
+        this.mostrarAlert("Digite o código enviado!", "danger");
+        $botao.prop("disabled", false).html("Ativar");
+        return;
+      }
+
+      $botao.prop("disabled", true).html("Ativando...");
+
+      var fd = new FormData();
+      fd.append("email", email);
+      fd.append("codigo", codigoDigitado);
+      fd.append("acao", "ativar");
+
+      $.ajax({
+        url: this.configuracao.urlProfissional,
+        method: "POST",
+        data: fd,
+        processData: false,
+        contentType: false
+      })
+        .done(function (resposta) {
+          $botao.prop("disabled", false).html("Ativar");
+          if ($.trim(resposta) === "sucesso") {
+            self.mostrarAlert("Conta ativada com sucesso!", "success");
+            self.estado.codigoGerado = false;
+            self.mostrarTela("loginProfissional");
+          } else {
+            $campoCodigo.addClass("is-invalid");
+            self.mostrarAlert(resposta, "danger");
+          }
+        })
+        .fail(function (xhr, status, erro) {
+          $botao.prop("disabled", false).html("Ativar");
+          console.error("Erro na ativação:", status, erro, xhr.responseText);
+          self.mostrarAlert("Erro na requisição de ativação!", "danger");
+        });
+    }
+  };
+
+  $(function () {
+    moduloCadProfissional.iniciar();
+  });
+
+})(jQuery, window.ElmoUtilitarios);

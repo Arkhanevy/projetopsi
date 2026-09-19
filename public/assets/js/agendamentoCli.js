@@ -23,7 +23,7 @@ console.log("JS agendamentoCli carregado");
     /* ---------- Configuração ---------- */
     configuracao: {
       urlServico: "index.php?uri=servico",
-      urlVerificarLogin: "index.php?uri=verificarLogin", //Axalote
+      urlVerificarLogin: "index.php?uri=cliente", //Axalote
       urlInfoServico: "index.php?uri=infoServico",
       urlLogin: "index.php?uri=login", //Axalote
       urlCadastro: "index.php?uri=cadastro"
@@ -201,7 +201,7 @@ console.log("JS agendamentoCli carregado");
         method: "POST",
         dataType: "json",
         data: {
-          acao: "MostrarDetalhes",
+          acao: "mostrardetalhes",
           ser_id: this.estado.idServico
         }
       })

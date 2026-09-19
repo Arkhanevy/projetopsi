@@ -20,7 +20,7 @@
       this.elementos.$camposDinamicos = $("[data-campo]");
       this.elementos.$cartaoServico = $("#cartaoServico");
 
-      this.estado.idServico = Utilitarios.obterParametroUrl("id");
+      this.estado.idServico = 1; // Axalote Utilitarios.obterParametroUrl("id");
 
       this.registrarEventos();
       this.buscarDadosServico();
@@ -58,7 +58,7 @@
         method: "POST",
         dataType: "json",
         data: {
-          acao: "MostrarDetalhes",
+          acao: "mostrardetalhes",
           ser_id: this.estado.idServico
         }
       })
@@ -147,7 +147,7 @@
       if (this.estado.idServico) {
         url += "&servico=" + encodeURIComponent(this.estado.idServico);
       }
-      window.location.href = url;
+      window.location.href = url; 
     }
   };
 

@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="public/assets/css/variaveis.css" /><!-- Variáveis globais -->
   <link rel="stylesheet" href="public/assets/css/componentes.css" /><!-- Componentes  -->
   <link rel="stylesheet" href="public/assets/css/consultasCli.css" /><!-- CSS próprio -->
-  <base href="/atual/">
 </head>
 <body class="bodyPagina">
 

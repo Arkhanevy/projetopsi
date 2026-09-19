@@ -49,7 +49,7 @@ switch ($acao){
                 'cxfoto',//$_POST['cxproFoto'],
                 $cod,
                 date('Y-m-d H:i:s'),
-                '',
+                null, #PAULO
                 "desativo",
                 $_POST['CNPJ'],
                 $_POST['CEP'],

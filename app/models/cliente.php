@@ -52,14 +52,14 @@ switch ($acao){
                 $cod,
                 $_POST['dtNas'] ?? '',
                 date('Y-m-d H:i:s'),
-                '',
+                null,#PAULO
                 "desativo",
                 $_POST['CPF'],
                 /*$_POST['CEP'] || '',*/
                 $_POST['telefone'],
                 $_POST['genero'],
                 0,
-                ''
+                0
             ];
                 $camposcli = implode(',',$camposcli);
             
@@ -143,5 +143,92 @@ switch ($acao){
                 echo "Erro no banco: " . $e->getMessage();
             }
             exit;
+            
+            
+            //EVELYN LOGIN
+        case "login":
+            
+            $email = $_POST['email'] ?? '';
+            $senha = $_POST['senhaLog'] ?? '';
+            
+            //ANTES
+            //$select = "clin_id,clin_nome,clin_email,clin_senha,clin_stat";
+            
+            //DEPOIS
+            $select = "cli_id,cli_nome,cli_email,cli_senha,cli_stat";
+            
+            try {
+                
+                //ANTES
+                //$db = new DBQuery("clinica", $select, "");
+                
+                //DEPOIS
+                $db = new DBQuery("cliente", $select, "");
+                
+                //ANTES
+                //$where = " WHERE clin_email = '" . $email . "'";
+                
+                //DEPOIS
+                $where = " WHERE cli_email = '" . $email . "'";
+                
+                $resultado = $db->selectWhere($where);
+                
+                //ANTES
+                //$clinica = $resultado->fetch(PDO::FETCH_ASSOC);
+                
+                //DEPOIS
+                $cliente = $resultado->fetch(PDO::FETCH_ASSOC);
+                
+                //ANTES
+                //if (!$clinica) {
+                
+                //DEPOIS
+                if (!$cliente) {
+                    echo "E-mail não encontrado";
+                    exit;
+                }
+                    
+                //ANTES
+                //if ($clinica['clin_stat'] != 'ativo') {
+            
+                //DEPOIS
+                if ($cliente['cli_stat'] != 'ativo') {
+                    echo "Conta não ativada";
+                    exit;
+                }
+                
+                //ANTES
+                //if (!password_verify($senha, $clinica['clin_senha'])) {
+                
+                //DEPOS
+                if (!password_verify($senha, $cliente['cli_senha'])) {
+                    echo "Senha inválida";
+                    exit;
+                }
+                
+                //ANTES
+                //$_SESSION['clinica'] = [
+                //    'id' => $clinica['clin_id'],
+                    //    'nome' => $clinica['clin_nome'],
+                    //    'email' => $clinica['clin_email']
+                    //];
+                    
+                //DEPOIS
+                $_SESSION['cliente'] = [
+                    'id' => $cliente['cli_id'],
+                    'nome' => $cliente['cli_nome'],
+                    'email' => $cliente['cli_email']
+                ];
+                
+                echo "sucesso";
+                
+            } catch (\Exception $e) {
+                
+                echo $e->getMessage();
+                
+            }
+            
+            exit;
+            
 }
 ?>
