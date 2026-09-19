@@ -1,6 +1,6 @@
 <?php
 /*require 'autoload.php';
-TESTE DA EVELYN
+
 // Carrega manualmente as classes mais importantes
 require __DIR__ . '/app/models/servicos.php';
 require __DIR__ . '/app/models/cliente.php';
