@@ -153,41 +153,9 @@
                         </form>
 
                         <p>
-                            Já tem uma conta? <a class="logarProfissional" href="#">Faça login</a>
+                            Já tem uma conta? <a href="index.php?uri=loginProfissional">Faça login</a>
                         </p>
 
-
-                    </div>
-
-                    <!-- LOGIN PROFISSIONAL-->
-                    <div id="loginProfissional">
-                        <div class="text-center mt-4">
-                            <div class="d-flex align-items-center justify-content-center gap-2">
-                                <img src="public/assets/images/logo_verde.png" class="logo-titulo">
-                                <h1 class="m-0">Seja Bem-Vindo de Volta!</h1>
-                            </div>
-                            <p class="text-muted mt-2 mx-auto" style="max-width: 400px;">
-                                Faça um login como profissional para que os clientes possam encontrar seus serviços.
-                            </p>
-                        </div>
-                        <form class="mt-4" enctype="multipart/form-data">
-                                <div class="form-floating mb-3">
-                                    <input name="cxproEmailLog" id="emailCadastroLog" class="form-control" type="email"
-                                        placeholder="E-mail" required>
-                                    <label>E-mail</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input name="cxproSenhaLog" id="senhaProfissionalLog" class="form-control" type="password"
-                                        placeholder="Senha" required>
-                                    <label>Senha</label>
-                                </div>
-                                <div class="d-grid mb-3">
-                                    <button type="submit" id="btnLogar" class="btn btn-success">Logar</button>
-                                </div>
-                        </form>
-                        
-                        <p> Não tem conta? <a class="cadastrarProfissional" href="#">Cadastre-se</a></p>
-                        <!-- <a id="linkEsqueci" href="#">Esqueci a senha</a> -->
 
                     </div>
 
@@ -215,6 +183,7 @@
       
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script><!-- jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><!-- Bootstrap 5 (bundle com Popper) -->
+    <script src="public/assets/js/utilitarios.js"></script>
     <script src="public/assets/js/cadProfissional.js"></script>
 
 </body>

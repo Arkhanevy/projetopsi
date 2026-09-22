@@ -181,7 +181,13 @@ class DBQuery {
         }
         
         $sql = "INSERT INTO {$this->tableName} (" . implode(', ', $this->fieldsName) . ")";
-        $sql .= " VALUES ('" . implode("', '", $values) . "')";
+        //PERGUNTAR
+        // $sql .= " VALUES ('" . implode("', '", $values) . "')";
+        $valores = array_map(function ($valor) {
+            return $valor === null ? "NULL" : "'" . $valor . "'";
+        }, $values);
+
+        $sql .= " VALUES (" . implode(", ", $valores) . ")";
         // echo $sql;
         try {
             return $this->conn->query($sql);

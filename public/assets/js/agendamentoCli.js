@@ -23,7 +23,7 @@ console.log("JS agendamentoCli carregado");
     /* ---------- Configuração ---------- */
     configuracao: {
       urlServico: "index.php?uri=servico",
-      urlVerificarLogin: "index.php?uri=verificarLogin", //Axalote
+      urlVerificarLogin: "index.php?uri=cliente", //Axalote
       urlInfoServico: "index.php?uri=infoServico",
       urlLogin: "index.php?uri=login", //Axalote
       urlCadastro: "index.php?uri=cadastro"
@@ -201,7 +201,7 @@ console.log("JS agendamentoCli carregado");
         method: "POST",
         dataType: "json",
         data: {
-          acao: "MostrarDetalhes",
+          acao: "mostrardetalhes",
           ser_id: this.estado.idServico
         }
       })
@@ -594,13 +594,16 @@ console.log("JS agendamentoCli carregado");
       this.esconderAlertaValidacao();
       this.verificarLoginEEnviar();
     },
-
+    
     verificarLoginEEnviar: function () {
       var self = this;
 
       $.ajax({
         url: this.configuracao.urlVerificarLogin,
         method: "POST",
+        data: {
+          acao: "verificarLogin"
+        },
         dataType: "json"
       })
         .done(function (resposta) {
@@ -617,10 +620,8 @@ console.log("JS agendamentoCli carregado");
 
     enviarAgendamento: function () {
       var self = this;
-      var partesHorario = (this.estado.horarioSelecionado || "").split("|");// Retornar o horario para "inicio" e "termino" separados.
-
+      var partesHorario = (this.estado.horarioSelecionado || "").split("|");// Retornar o horario para "inicio" e "termino" separados.*
       this.elementos.$botaoConfirmar.prop("disabled", true);
-
       $.ajax({
         url: this.configuracao.urlServico,
         method: "POST",
@@ -641,11 +642,13 @@ console.log("JS agendamentoCli carregado");
             "Não foi possível concluir o agendamento. Tente novamente."
           );
         })
+
         .fail(function () {
           self.exibirAlertaValidacao(
             "Não foi possível concluir o agendamento. Tente novamente."
           );
         })
+
         .always(function () {
           self.elementos.$botaoConfirmar.prop("disabled", false);
         });
@@ -660,7 +663,6 @@ console.log("JS agendamentoCli carregado");
     },
 
     /* MODAIS */
-
     exibirModalErro: function () {
       Utilitarios.exibirModal(this.elementos.$modalErro, {
         backdrop: "static",

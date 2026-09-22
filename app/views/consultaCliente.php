@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="public/assets/css/variaveis.css" /><!-- Variáveis globais -->
   <link rel="stylesheet" href="public/assets/css/componentes.css" /><!-- Componentes  -->
   <link rel="stylesheet" href="public/assets/css/consultasCli.css" /><!-- CSS próprio -->
-  <base href="/atual/">
 </head>
 <body class="bodyPagina">
 
@@ -88,19 +87,6 @@
             <span class="badgeStatus badgeStatusPendente">Pendente</span>
           </div>
         </article>
-        <article class="cartaoConsulta cartaoConsultaEsqueleto" aria-hidden="true">
-          <h2 class="tituloConsulta">Pedicure</h2>
-          <div class="linhaConsulta d-flex justify-content-between">
-            <p class="dataHoraConsulta">26 de junho, 08:00</p>
-            <p class="precoConsulta">R$80,50</p>
-          </div>
-          <p class="profissionalConsulta"><strong>Profissional:</strong> Katarina</p>
-          <p class="clinicaConsulta"><strong>Clínica:</strong> Girasol</p>
-          <div class="rodapeConsulta d-flex justify-content-between align-items-center">
-            <span class="botaoCancelar btn rounded-pill">Cancelar</span>
-            <span class="badgeStatus badgeStatusAgendada">Agendada</span>
-          </div>
-        </article>
       </div>
 
       <!-- Estado vazio -->
@@ -174,23 +160,10 @@
   </div>
 
   <!-- MODAL: CONFIRMAR CANCELAMENTO -->
-  <div
-    class="modal fade modalPadrao"
-    id="modalConfirmarCancelamento"
-    tabindex="-1"
-    aria-labelledby="tituloModalConfirmarCancelamento"
-    aria-describedby="textoModalConfirmarCancelamento"
-    aria-modal="true"
-    role="dialog"
-  >
+  <div class="modal fade modalPadrao" id="modalConfirmarCancelamento" tabindex="-1" aria-labelledby="tituloModalConfirmarCancelamento" aria-describedby="textoModalConfirmarCancelamento" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <button
-          type="button"
-          class="botaoFecharModal btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Fechar"
-        ></button>
+        <button type="button" class="botaoFecharModal btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
 
         <div class="modal-body text-center">
           <h2 id="tituloModalConfirmarCancelamento" class="tituloModal">Cuidado!</h2>

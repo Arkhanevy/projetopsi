@@ -7,10 +7,10 @@ switch ($acao){
         $cadastro = $servico->cadastrar(0, $_SESSION['id'], $_POST['nome'], $_POST['tipo'], $_POST['desc'], $_POST['dur'], $_POST['inter'], $_POST['val'], $_POST['stat'], $_POST['dia']);
         echo $cadastro;
         exit;
-    case "pao":
-        $mostrar = $servico->Mostrarservico();
+    case "mostrarservico":
+        $mostrar = $servico->mostrardetalhes();
         exit;
-    case 'MostrarServico':// vou mudar para detalhes
+    case 'mostrardetalhes':// vou mudar para detalhes
         if (empty($_SESSION['servico'])) {
             $_SESSION['servico'] = [
                 'ser_id' => '',       // ID do serviço
@@ -19,7 +19,7 @@ switch ($acao){
                 'ser_inter' => ''    // Intervalo em minutos
             ];
         }
-        $mostrar= $servico->MostrarDetalhes(2/*$_POST['ser_id']*/);
+        $mostrar= $servico->MostrarDetalhes(1/*$_POST['ser_id']*/);
         
         // Verifica se teve sucesso
         if ($mostrar['sucesso']) {
@@ -59,7 +59,7 @@ switch ($acao){
         echo json_encode($mostrar);
         exit;
     case 'agendar':
-        $agendar = $servico->agendar($_SESSION['servico']['ser_pro'], $_SESSION['id'],$_SESSION['servico']['ser_id'],/*$_SESSION['servico']['ser_sala'],*/ $_POST['dia'], $_POST['inicio'], $_POST['termino']);
+        $agendar = $servico->agendar($_SESSION['servico']['ser_pro'], $_SESSION['idUsuario'],$_SESSION['servico']['ser_id'],/*$_SESSION['servico']['ser_sala'],*/ $_POST['dia'], $_POST['inicio'], $_POST['termino']);
         $_SESSION['servico'] = [];
         $_SESSION['datas'] = [];
         $_SESSION['horarios'] = [];

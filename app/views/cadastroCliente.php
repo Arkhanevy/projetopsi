@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <base href="/ProjetoExemplo/">
     <title>Cadastro do Cliente</title>
 </head>
 <style>
@@ -28,12 +27,12 @@
         overflow: hidden;
     }
 
-    #ativacao, #loginCliente, .cadastro {
+    #ativacao, .cadastro {
         display: none;
     }
 
     /* CARD DO CADASTRO */
-    #cadastroCliente, #ativacao, #loginCliente {
+    #cadastroCliente, #ativacao {
         width: 100%;
         max-width: 500px;
         max-height: 90vh;
@@ -144,7 +143,7 @@
                     <button type="submit" id="btnCadastrar" class="btn btn-success">Cadastrar</button>
                 </div>
             </form>
-            <p>Já tem uma conta? <a class="logarCliente" href="#">Faça login</a></p>
+            <p>Já tem uma conta? <a href="index.php?uri=loginCliente">Faça login</a></p>
         </div>
         
         <!--Ativação-->
@@ -163,32 +162,13 @@
             </form>
         </div>
 
-        <!--Login-->
-            <div class="img-thumbnail bg-light border border-success p-4 rounded-4 shadow" id="loginCliente">
-                <h1 class="text-muted mt-5 mx-auto">Seja Bem-Vindo de Volta!</h1>
-                <p class="text-muted mt-5 mx-auto"> Entre para poder agendar suas consultas.</p>
-                <form action="../model/caduser.php" method="POST">
-                    <div class="form-floating mt-5 mb-3">
-                        <input name="cxcliEmail" id="emailLogin" class="form-control" type="email" placeholder="E-mail"
-                            required>
-                        <label>E-mail</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input name="cxcliSenha" id="senhaLogin" class="form-control" type="password" placeholder="Senha"
-                            required>
-                        <label>Senha</label>
-                    </div>
-                    <div class="d-grid mb-3">
-                        <button type="submit" id="btnLogar" class="btn btn-success">Logar</button>
-                    </div>
-                </form>
-                <p>Ainda não tem conta? <a class="cadastrarCliente" href="#">Faça o cadastro</a></p>
-            </div>
 
     </div>
 
-       <script> window.BASE_URL = "<?= BASE_URL ?>"; </script>
-    <script src="/ProjetoExemplo/public/assets/js/cadCli.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script><!-- jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><!-- Bootstrap 5 (bundle com Popper) -->
+    <script src="public/assets/js/utilitarios.js"></script>
+    <script src="public/assets/js/cadCliente.js"></script>
 
 </body>
 

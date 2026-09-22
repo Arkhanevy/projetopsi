@@ -25,10 +25,10 @@
   var moduloConsultasCli = {
 
     configuracao: {
-      urlVerificarSessao: "/backend/verificarSessao.php",
-      urlObterConsultas: "/backend/obterConsultas.php",
-      urlCancelarConsulta: "/backend/cancelarConsulta.php",
-      urlLogin: "/login/index.html"
+      urlVerificarSessao: "/backend/verificarSessao.php", //Axalote
+      urlObterConsultas: "app/controllers/Servicocontroller.php",
+      urlCancelarConsulta: "/backend/cancelarConsulta.php", //Axalote
+      urlLogin: "/login/index.html" //Axalote
     },
 
     elementos: {},
@@ -36,7 +36,7 @@
     iniciar: function () {
       this.cachearElementos();
       this.registrarEventos();
-      this.verificarSessaoEBuscarConsultas();
+      //this.verificarSessaoEBuscarConsultas();
     },
 
     cachearElementos: function () {
@@ -76,7 +76,7 @@
       });
     },
 
-    verificarSessaoEBuscarConsultas: function () {
+    /*verificarSessaoEBuscarConsultas: function () {
       var self = this;
 
       $.ajax({
@@ -94,7 +94,7 @@
         .fail(function () {
           self.exibirModalSessaoExpirada();
         });
-    },
+    },*/
 
     exibirModalSessaoExpirada: function () {
       this.elementos.$grade.removeClass("estadoCarregando").attr("hidden", "hidden");
@@ -109,8 +109,11 @@
 
       $.ajax({
         url: this.configuracao.urlObterConsultas,
-        method: "GET",
-        dataType: "json"
+        method: "POST",
+        dataType: "json",
+        data: {
+          acao: "mostrarservico"
+        }
       })
         .done(function (resposta) {
           self.elementos.$grade.removeClass("estadoCarregando");

@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="public/assets/css/variaveis.css" /><!-- Variáveis globais  -->
   <link rel="stylesheet" href="public/assets/css/componentes.css" /><!-- Componentes compartilhados -->
   <link rel="stylesheet" href="public/assets/css/infoServico.css" /><!-- CSS próprio -->
-  <!-- <base href="/atual/"> -->
 </head>
 <body class="bodyPagina">
 
@@ -118,11 +117,7 @@
               </p>
             </section>
 
-            <button
-              type="button"
-              id="botaoAgendarAgora"
-              class="botaoAgendarAgora botaoPrimario btn rounded-pill order-5"
-            >
+            <button type="button" id="botaoAgendarAgora" class="botaoAgendarAgora botaoPrimario btn rounded-pill order-5">
               Agendar agora
             </button>
 
@@ -154,15 +149,7 @@
   </div>
 
   <!-- MODAL: SERVIÇO NÃO ENCONTRADO  -->
-  <div
-    class="modal fade modalPadrao modalErro"
-    id="modalServicoNaoEncontrado"
-    tabindex="-1"
-    aria-labelledby="tituloModalServicoNaoEncontrado"
-    aria-describedby="textoModalServicoNaoEncontrado"
-    aria-modal="true"
-    role="dialog"
-  >
+  <div class="modal fade modalPadrao modalErro" id="modalServicoNaoEncontrado" tabindex="-1" aria-labelledby="tituloModalServicoNaoEncontrado" aria-describedby="textoModalServicoNaoEncontrado" aria-modal="true" role="dialog" >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-body text-center">
@@ -196,23 +183,10 @@
   </div>
 
   <!--  MODAL: PEDIDO DE AGENDAMENTO ENVIADO  -->
-  <div
-    class="modal fade modalPadrao modalSucesso"
-    id="modalAgendamentoEnviado"
-    tabindex="-1"
-    aria-labelledby="tituloModalAgendamentoEnviado"
-    aria-describedby="textoModalAgendamentoEnviado"
-    aria-modal="true"
-    role="dialog"
-  >
+  <div class="modal fade modalPadrao modalSucesso" id="modalAgendamentoEnviado" tabindex="-1" aria-labelledby="tituloModalAgendamentoEnviado" aria-describedby="textoModalAgendamentoEnviado"  aria-modal="true"  role="dialog">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <button
-          type="button"
-          class="botaoFecharModal btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Fechar"
-        ></button>
+        <button type="button" class="botaoFecharModal btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
 
         <div class="modal-body text-center">
           <h2 id="tituloModalAgendamentoEnviado" class="tituloModal">
@@ -228,7 +202,7 @@
           <p class="textoModal">
             Quando a consulta for confirmada, você receberá uma mensagem. Para acompanhar o
             status ou reagendar sua consulta, acesse as
-            <a href="/minhas-consultas" id="linkMinhasConsultas" class="linkTexto">Minhas Consultas</a>.
+            <a href="/projetopsi/index.php?uri=consultasCli" id="linkMinhasConsultas" class="linkTexto">Minhas Consultas</a>.
           </p>
         </div>
       </div>

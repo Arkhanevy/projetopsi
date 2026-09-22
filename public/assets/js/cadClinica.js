@@ -1,522 +1,345 @@
-$(document).ready(function () {
-    console.log("cadClinica.js carregado");
+console.log("JS cadClinica carregado");
+/* ============================================================
+   PÁGINA: cadClinica (Cadastro / Ativação da Clínica)
+   Depende de: jQuery, Bootstrap 5 (bundle JS), ElmoUtilitarios
+   (ver /assets/js/utilitarios.js — deve ser carregado antes deste arquivo)
 
-    const telas = {
+   Responsabilidades deste arquivo:
+   - Alternar entre as telas de cadastro e ativação
+     da clínica.
+   - Preencher automaticamente o endereço a partir do CEP (ViaCEP).
+   - Validar e enviar o formulário de cadastro via AJAX (com upload
+     da imagem de perfil).
+   - Gerar/reenviar o código de ativação por e-mail.
+   - Validar o código informado e ativar a conta.
+   ============================================================ */
+
+(function ($, Utilitarios) {
+  "use strict";
+
+  var moduloCadClinica = {
+
+    /* ---------- Configuração ---------- */
+    configuracao: {
+      urlClinica: "/projetopsi/index.php?uri=clinica", //Axolote
+      urlLogin: "index.php?uri=loginClinica"
+    },
+
+    /* ---------- Estado interno ---------- */
+    estado: {
+      telaInicial: "cadastroClinica",
+      codigoGerado: false
+    },
+
+    /* ---------- Referências de elementos (cacheadas) ---------- */
+    telas: {},
+    elementos: {},
+
+    /**
+     * Ponto de entrada. Deve ser chamado uma vez, quando o
+     * documento estiver pronto.
+     */
+    iniciar: function () {
+      this.urlElementos();
+
+      var el = this.elementos;
+      Utilitarios.configurarPreviewImagem(el.$alertContainer, el.$img, el.$preview);
+      Utilitarios.configurarCEP(el.$alertContainer, {
+        cep: el.$cep,
+        rua: el.$rua,
+        bairro: el.$bairro,
+        cidade: el.$cidade,
+        uf: el.$uf,
+        ibge: el.$ibge
+      });
+
+      this.registrarEventos();
+      this.mostrarTela(this.estado.telaInicial);
+    },
+
+    urlElementos: function () {
+      this.telas = {
         cadastroClinica: $("#cadastroClinica"),
-        loginClinica: $("#loginClinica"),
-        ativacao: $("#ativacao"),
-        perfilClinica: $("#perfilClinica")
-    };
+        ativacao: $("#ativacao")
+      };
 
-    function mostrarTela(nomeTela) {
-        Object.values(telas).forEach(tela => tela.hide());
+      this.elementos.$alertContainer = $("#alertContainer");
 
-        if (telas[nomeTela]) {
-            telas[nomeTela].show();
-        } else {
-            console.warn("Tela não encontrada:", nomeTela);
-        }
-    }
+      this.elementos.$img = $("#img_perfil_Clinica");
+      this.elementos.$preview = $("#previewClinica");
+      this.elementos.$nome = $("#nomeClinica");
+      this.elementos.$email = $("#emailCadClinica");
+      this.elementos.$tel = $("#telClinica");
+      this.elementos.$user = $("#userClinica");
+      this.elementos.$bio = $("#bioClinica");
+      this.elementos.$cnpj = $("#cnpj");
+      this.elementos.$senha = $("#senhaClinica");
+      this.elementos.$cep = $("#cepClinica");
+      this.elementos.$rua = $("#ruaClinica");
+      this.elementos.$bairro = $("#bairroClinica");
+      this.elementos.$uf = $("#ufClinica");
+      this.elementos.$ibge = $("#ibgeClinica");
+      this.elementos.$cidade = $("#cidadeClinica");
+      this.elementos.$form = $("#cadastroClinica");
 
-    mostrarTela("cadastroClinica");
 
-    let geradoCod = false;
+      this.elementos.$emailAtivacao = $("#emailAtivar");
+      this.elementos.$codigo = $("#codigoCliente");
 
-    const BASE_URL = "<?= BASE_URL ?>";
+      this.elementos.$botaoCadastrar = $("#btnCadClinica");
+      this.elementos.$botaoCodigo = $("#btnCodigo");
+      this.elementos.$botaoAtivar = $("#btnAtivar");
+    },
 
-    //Objetos-Dados da clínica
-    const cli = {
-        img: $("#img_perfil_Clinica"),
-        preview: $("#previewClinica"),
-        nome: $("#nomeClinica"),
-        email: $("#emailCadClinica"),
-        tel: $("#telClinica"),
-        user: $("#userClinica"),
-        bio: $("#bioClinica"),
-        cnpj: $("#cnpj"),
-        senha: $("#senhaClinica"),
-        cep: $("#cepClinica"),
-        rua: $("#ruaClinica"),
-        bairro: $("#bairroClinica"),
-        uf: $("#ufClinica"),
-        ibge: $("#ibgeClinica"),
-        cidade: $("#cidadeClinica"),
-        form: $("#cadastroClinica"),
-        login: $("#loginClinica"),
-        loginEmail: $("#emailLogClinica"),
-        loginSenha: $("#senhaLogClinica"),
-        emailAtivacao: $("#emailAtivar"),
-        codigo: $("#codigoCliente")
-    };
+    registrarEventos: function () {
+      var self = this;
 
-    //Funções
-    function mostrarAlert(mensagem, tipo = "success") {
-        const $container = $("#alertContainer");
-
-        const $alert = $(`
-            <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
-                ${mensagem}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `);
-
-        $container.append($alert);
-
-        setTimeout(() => {
-            $alert.fadeOut(200, () => $alert.remove());
-        }, 3000);
-    }
-
-    function emailValido(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function apenasNumeros(v) {
-        return v.replace(/\D/g, "");
-    }
-
-    function validarCampos(campos) {
-        let erro = false;
-
-        campos.forEach(c => {
-            if (!c.valor) {
-                c.el.addClass("is-invalid");
-                erro = true;
-            }
-        });
-
-        return erro;
-    }
-
-    function cnpjValido(cnpj) {
-        cnpj = cnpj.replace(/\D/g, "");
-
-        if (cnpj.length !== 14) return false;
-        if (/^(\d)\1+$/.test(cnpj)) return false;// Elimina CNPJs inválidos conhecidos
-
-        let tamanho = 12;
-        let numeros = cnpj.substring(0, tamanho);
-        let digitos = cnpj.substring(tamanho);
-
-        let soma = 0;
-        let pos = tamanho - 7;
-
-        for (let i = tamanho; i >= 1; i--) {
-            soma += numeros.charAt(tamanho - i) * pos--;
-            if (pos < 2) pos = 9;
-        }
-
-        let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
-
-        if (resultado != digitos.charAt(0)) return false;
-
-        tamanho = 13;
-        numeros = cnpj.substring(0, tamanho);
-
-        soma = 0;
-        pos = tamanho - 7;
-
-        for (let i = tamanho; i >= 1; i--) {
-            soma += numeros.charAt(tamanho - i) * pos--;
-            if (pos < 2) pos = 9;
-        }
-
-        resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
-
-        return resultado == digitos.charAt(1);
-    }
-
-    //IMG
-    function configurarPreview(input, preview) {
-
-        preview.on("click", () => input.trigger("click"));
-
-        input.on("change", function () {
-
-            const file = this.files[0];
-
-            if (!file || !file.type.startsWith("image/")) {
-                mostrarAlert("Selecione uma imagem válida!", "danger");
-                return;
-            }
-
-            const reader = new FileReader();
-
-            reader.onload = e => preview.attr("src", e.target.result);
-            reader.readAsDataURL(file);
-        });
-    }
-
-    //CEP
-    function configurarCEP(config) {
-
-        config.cep.on("blur", function () {
-
-            const cep = apenasNumeros($(this).val());
-
-            if (!/^[0-9]{8}$/.test(cep)) {
-                config.cep.addClass("is-invalid");
-                config.rua.addClass("is-invalid");
-                config.bairro.addClass("is-invalid");
-                config.cidade.addClass("is-invalid");
-                config.uf.addClass("is-invalid");
-                config.ibge.addClass("is-invalid");
-                mostrarAlert("CEP inválido!", "danger");
-                return;
-            }
-
-            config.rua.val("...");
-            config.bairro.val("...");
-            config.cidade.val("...");
-            config.uf.val("...");
-            config.ibge.val("...");
-
-            $.getJSON(`https://viacep.com.br/ws/${cep}/json/?callback=?`, function (dados) {
-
-                if (dados.erro) {
-                    mostrarAlert("CEP não encontrado!", "danger");
-                    config.cep.addClass("is-invalid");
-                    config.rua.addClass("is-invalid");
-                    config.bairro.addClass("is-invalid");
-                    config.cidade.addClass("is-invalid");
-                    config.uf.addClass("is-invalid");
-                    config.ibge.addClass("is-invalid");
-                    return;
-                } else {
-                    config.rua.val(dados.logradouro);
-                    config.bairro.val(dados.bairro);
-                    config.cidade.val(dados.localidade);
-                    config.uf.val(dados.uf);
-                    config.ibge.val(dados.ibge);
-                    config.cep.removeClass("is-invalid");
-                    config.rua.removeClass("is-invalid");
-                    config.bairro.removeClass("is-invalid");
-                    config.cidade.removeClass("is-invalid");
-                    config.uf.removeClass("is-invalid");
-                    config.ibge.removeClass("is-invalid");
-                    return;
-                }
-            });
-        });
-
-        config.cep.on("input", function () {
-            $(this).removeClass("is-invalid");
-        });
-    }
-
-    //Funções-Estrutura
-    configurarPreview(cli.img, cli.preview);
-
-    configurarCEP({
-        cep: cli.cep,
-        rua: cli.rua,
-        bairro: cli.bairro,
-        cidade: cli.cidade,
-        uf: cli.uf,
-        ibge: cli.ibge
-    });
-
-    $(document).on("input change", ".form-control, .form-select, textarea", function () {
+      // Remove o estado de erro assim que o usuário volta a interagir com o campo.
+      $(document).on("input change", ".form-control, .form-select, textarea", function () {
         $(this).removeClass("is-invalid");
-    });
+      });
 
-    //Troca de telas
-    $(".logarClinica").on("click", function (e) {
-        e.preventDefault();
-        mostrarTela("loginClinica");
-    });
+      this.elementos.$botaoCadastrar.on("click", function (evento) {
+        evento.preventDefault();
+        self.enviarCadastro($(this));
+      });
 
-    $(".cadastrarClinica").on("click", function (e) {
-        e.preventDefault();
-        mostrarTela("cadastroClinica");
-    });
+      this.elementos.$botaoCodigo.on("click", function (evento) {
+        evento.preventDefault();
+        self.gerarCodigo($(this));
+      });
 
-    //CADASTRO CLINICA
-    $("#btnCadClinica").on("click", function (e) {
-        e.preventDefault();
-        const btn = $(this);
-        btn.prop("disabled", true).html("Cadastrando...");
-        const campos = [
-            { valor: cli.nome.val(), el: cli.nome },
-            { valor: cli.tel.val(), el: cli.tel },
-            { valor: cli.user.val(), el: cli.user },
-            { valor: cli.bio.val(), el: cli.bio },
-            { valor: cli.senha.val(), el: cli.senha },
-            { valor: cli.email.val(), el: cli.email },
-            { valor: cli.cep.val(), el: cli.cep },
-            { valor: cli.rua.val(), el: cli.rua },
-            { valor: cli.bairro.val(), el: cli.bairro },
-            { valor: cli.uf.val(), el: cli.uf },
-            { valor: cli.ibge.val(), el: cli.ibge },
-            { valor: cli.cidade.val(), el: cli.cidade },
-            { valor: cli.cnpj.val(), el: cli.cnpj }
-        ];
+      this.elementos.$botaoAtivar.on("click", function (evento) {
+        evento.preventDefault();
+        self.ativarConta($(this));
+      });
+    },
 
-        if (validarCampos(campos)) {
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("Preencha todos os campos!", "danger");
-            return;
-        }
+    /* TELAS */
 
-        // CNPJ
-        const cnpj = cli.cnpj.val().trim();
+    mostrarTela: function (nomeTela) {
+      var self = this;
+      Object.keys(this.telas).forEach(function (chave) {
+        self.telas[chave].hide();
+      });
 
-        if (!cnpj || !cnpjValido(cnpj)) {
-            cli.cnpj.addClass("is-invalid");
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("CNPJ inválido!", "danger");
-            return;
-        }
+      if (this.telas[nomeTela]) {
+        this.telas[nomeTela].show();
+      } else {
+        console.warn("Tela não encontrada:", nomeTela);
+      }
+    },
 
-        // IMAGEM
-        if (!cli.img[0].files || cli.img[0].files.length === 0) {
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("Imagem obrigatória!", "danger");
-            return;
-        }
+    /* ALERTAS */
 
-        //E-MAIL
-        const email = cli.email.val().trim();
-        if (!email || !emailValido(email)) {
-            cli.email.addClass("is-invalid");
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("E-mail inválido!", "danger");
-            return;
-        }
+    mostrarAlert: function (mensagem, tipo) {
+      Utilitarios.mostrarAlerta(this.elementos.$alertContainer, mensagem, tipo);
+    },
 
-        // CEP
-        if (apenasNumeros(cli.cep.val()).length !== 8) {
-            cli.cep.addClass("is-invalid");
-            cli.rua.addClass("is-invalid");
-            cli.bairro.addClass("is-invalid");
-            cli.uf.addClass("is-invalid");
-            cli.ibge.addClass("is-invalid");
-            cli.cidade.addClass("is-invalid");
-            btn.prop("disabled", false).html("Cadastrar");
-            mostrarAlert("CEP inválido!", "danger");
-            return;
-        }
+    /* CADASTRO */
 
-        const CNPJLimpo = cli.cnpj.val().replace(/\D/g, "");
-        const CEPLimpo = cli.cep.val().replace(/\D/g, "");
+    enviarCadastro: function ($botao) {
+      var self = this;
+      var el = this.elementos;
 
-        const formData = new FormData();
-        formData.append("nome", cli.nome.val());
-        formData.append("email", email);
-        formData.append("telefone", apenasNumeros(cli.tel.val()));
-        formData.append("username", cli.user.val());
-        formData.append("bio", cli.bio.val());
-        formData.append("CEP", CEPLimpo);
-        formData.append("CNPJ", CNPJLimpo);
-        formData.append("senha", cli.senha.val());
-        formData.append("cxclinFoto", cli.img[0].files[0]);
-        formData.append("acao", "cadastrar");
+      $botao.prop("disabled", true).html("Cadastrando...");
 
-        $.ajax({
-            url: "/z/index.php?uri=clinica", //Axolote
-            method: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
+      var campos = [
+        { valor: el.$nome.val(), el: el.$nome },
+        { valor: el.$tel.val(), el: el.$tel },
+        { valor: el.$user.val(), el: el.$user },
+        { valor: el.$bio.val(), el: el.$bio },
+        { valor: el.$senha.val(), el: el.$senha },
+        { valor: el.$email.val(), el: el.$email },
+        { valor: el.$cep.val(), el: el.$cep },
+        { valor: el.$rua.val(), el: el.$rua },
+        { valor: el.$bairro.val(), el: el.$bairro },
+        { valor: el.$uf.val(), el: el.$uf },
+        { valor: el.$ibge.val(), el: el.$ibge },
+        { valor: el.$cidade.val(), el: el.$cidade },
+        { valor: el.$cnpj.val(), el: el.$cnpj }
+      ];
 
-            success: function (resposta) {
-                btn.prop("disabled", false).html("Cadastrar");
+      if (Utilitarios.validarCampos(campos)) {
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("Preencha todos os campos!", "danger");
+        return;
+      }
 
-                if (resposta.trim() === "sucesso") {
-                    mostrarAlert("Cadastro realizado!", "success");
-                    mostrarTela("ativacao");
-                } else {
-                    mostrarAlert(resposta, "danger");
-                }
-            },
+      var cnpj = el.$cnpj.val().trim();
+      if (!cnpj || !Utilitarios.cnpjValido(cnpj)) {
+        el.$cnpj.addClass("is-invalid");
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("CNPJ inválido!", "danger");
+        return;
+      }
 
-            error: function () {
-                btn.prop("disabled", false).html("Cadastrar");
-                mostrarAlert("Erro na requisição!", "danger");
-            }
+      if (!Utilitarios.telefoneValido(el.$tel.val())) {
+        el.$tel.addClass("is-invalid");
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("Telefone inválido!", "danger");
+        return;
+      }
+
+      if (!el.$img[0].files || el.$img[0].files.length === 0) {
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("Imagem obrigatória!", "danger");
+        return;
+      }
+
+      var email = el.$email.val().trim();
+      if (!Utilitarios.emailValido(email)) {
+        el.$email.addClass("is-invalid");
+        $botao.prop("disabled", false).html("Cadastrar");
+        this.mostrarAlert("E-mail inválido!", "danger");
+        return;
+      }
+
+      if (Utilitarios.apenasNumeros(el.$cep.val()).length !== 8) {
+        Utilitarios.marcarCamposComErro(el.$alertContainer, [el.$cep, el.$rua, el.$bairro, el.$uf, el.$ibge, el.$cidade], "CEP inválido!");
+        $botao.prop("disabled", false).html("Cadastrar");
+        return;
+      }
+
+      var cnpjLimpo = Utilitarios.apenasNumeros(el.$cnpj.val());
+      var cepLimpo = Utilitarios.apenasNumeros(el.$cep.val());
+
+      var formData = new FormData();
+      formData.append("nome", el.$nome.val());
+      formData.append("email", email);
+      formData.append("telefone", Utilitarios.apenasNumeros(el.$tel.val()));
+      formData.append("username", el.$user.val());
+      formData.append("bio", el.$bio.val());
+      formData.append("CEP", cepLimpo);
+      formData.append("CNPJ", cnpjLimpo);
+      formData.append("senha", el.$senha.val());
+      formData.append("cxclinFoto", el.$img[0].files[0]);
+      formData.append("acao", "cadastrar");
+
+      $.ajax({
+        url: this.configuracao.urlClinica,
+        method: "POST",
+        data: formData,
+        processData: false,
+        contentType: false
+      })
+        .done(function (resposta) {
+          $botao.prop("disabled", false).html("Cadastrar");
+          if ($.trim(resposta) === "sucesso") {
+            self.mostrarAlert("Cadastro realizado!", "success");
+            self.mostrarTela("ativacao");
+          } else {
+            self.mostrarAlert(resposta, "danger");
+          }
+        })
+        .fail(function () {
+          $botao.prop("disabled", false).html("Cadastrar");
+          self.mostrarAlert("Erro na requisição!", "danger");
         });
-    });
-    $("input").on("input", function () {
-        $(this).removeClass("is-invalid");
-    });
+    },
 
-    //Login
-    $("#btnLogClinica").on("click", function (e) {
-        e.preventDefault();
-        const btn = $(this);
-        btn.prop("disabled", true).html("Logando...");
+    /* CÓDIGO DE ATIVAÇÃO */
 
-        const campos = [
-            { valor: cli.loginEmail.val(), el: cli.loginEmail },
-            { valor: cli.loginSenha.val(), el: cli.loginSenha }
-        ];
+    gerarCodigo: function ($botao) {
+      var self = this;
 
-        if (validarCampos(campos)) {
-            btn.prop("disabled", false).html("Logar");
-            mostrarAlert("Preencha todos os campos!", "danger");
-            return;
+      $botao.prop("disabled", true);
+
+      var tempo = 60;
+      $botao.text("Aguarde " + tempo + "s para gerar um novo código");
+
+      var intervalo = setInterval(function () {
+        tempo--;
+        $botao.text("Aguarde " + tempo + "s para gerar um novo código");
+        if (tempo <= 0) {
+          clearInterval(intervalo);
+          $botao.prop("disabled", false);
+          $botao.text("Gerar código");
         }
+      }, 1000);
 
-        const email = cli.loginEmail.val().trim();
+      var email = this.elementos.$email.val().trim();
 
-        if (!email || !emailValido(email)) {
-            cli.loginEmail.addClass("is-invalid");
-            btn.prop("disabled", false).html("Logar");
-            mostrarAlert("E-mail inválido!", "danger");
-            return;
-        }
+      var fd = new FormData();
+      fd.append("email", email);
+      fd.append("acao", "ReGerarCodigo");
 
-        const fd = new FormData();
-        fd.append("email", email);
-        //fd.append("senhaLog", cli.loginSenha); Maria
-		fd.append("senhaLog", cli.loginSenha.val()); //evelyn
-        fd.append("acao", "login");
-
-        $.ajax({
-            url: "/z/index.php?uri=clinica", //Axolote
-            method: "POST",
-            data: fd,
-            processData: false,
-            contentType: false,
-
-            success: function (resposta) {
-                console.log("Foi mandado");
-                btn.prop("disabled", false).html("Logar");
-                
-				if (resposta.trim() === "sucesso") {
-					mostrarAlert("Login realizado com sucesso!", "success");
-                    //mostrarTela("perfilUser"); -> Maria
-					//inicio evelyn
-					setTimeout(() => {
-					    window.location.href ="/z/index.php?uri=home";
-					}, 1000);
-					//fim evelyn
-                } else {
-                    mostrarAlert(resposta, "danger");
-                    console.log("deu ruim");
-                    //window.location.href = "/z/index.php?uri=clinica"; -> Maria
-                }
-            },
-
-            error: function (xhr, status, error) {
-                console.log("STATUS:", status);
-                console.log("ERRO:", error);
-                console.log("RESPOSTA:", xhr.responseText);
-                mostrarAlert("Erro na requisição!", "danger");
-            }
+      $.ajax({
+        url: this.configuracao.urlClinica,
+        method: "POST",
+        data: fd,
+        processData: false,
+        contentType: false
+      })
+        .done(function (resposta) {
+          if ($.trim(resposta) === "sucesso") {
+            self.mostrarAlert("Código enviado com sucesso para o seu e-mail!", "success");
+            self.estado.codigoGerado = true;
+          } else {
+            self.mostrarAlert(resposta, "danger");
+          }
+        })
+        .fail(function () {
+          console.error("Erro na requisição ao gerar código!");
         });
-    });
-    $("input").on("input", function () {
-        $(this).removeClass("is-invalid");
-    });
+    },
 
-    // GERAR CÓDIGO
-    $("#btnCodigo").on("click", function (e) {
-        e.preventDefault();
+    ativarConta: function ($botao) {
+      var self = this;
+      var $campoCodigo = this.elementos.$codigo;
+      var codigoDigitado = $campoCodigo.val().trim();
+      var email = this.elementos.$email.val().trim();
 
-        const btn = $(this);
-        btn.prop("disabled", true);
+      if (!this.estado.codigoGerado) {
+        this.mostrarAlert("Gere um código primeiro!", "danger");
+        $botao.prop("disabled", false).html("Ativar");
+        return;
+      }
 
-        let tempo = 6;
-        btn.text(`Aguarde ${tempo}s para gerar um novo código`);
+      if (!codigoDigitado) {
+        $campoCodigo.addClass("is-invalid");
+        this.mostrarAlert("Digite o código enviado!", "danger");
+        $botao.prop("disabled", false).html("Ativar");
+        return;
+      }
 
-        const interval = setInterval(() => {
-            tempo--;
-            btn.text(`Aguarde ${tempo}s`);
-            if (tempo <= 0) {
-                clearInterval(interval);
-                btn.prop("disabled", false);
-                btn.text("Gerar código");
-            }
-        }, 1000);
+      $botao.prop("disabled", true).html("Ativando...");
 
-        const email = cli.email.val().trim();
-        const controller = "/z/index.php?uri=clinica"; //Axolote
+      var fd = new FormData();
+      fd.append("email", email);
+      fd.append("codigo", codigoDigitado);
+      fd.append("acao", "ativar");
 
-        const fd = new FormData();
-        fd.append("email", email);
-        fd.append("acao", "ReGerarCodigo");
-
-        $.ajax({
-            url: controller, //Axolote
-            method: "POST",
-            data: fd,
-            processData: false,
-            contentType: false,
-            success: function (resposta) {
-                if (resposta.trim() === "sucesso") {
-                    mostrarAlert("Código enviado com sucesso para o seu e-mail!", "success");
-                    geradoCod = true;
-                } else {
-                    mostrarAlert(resposta, "danger");
-                    mostrarAlert("Não gerado", "danger");
-                }
-            },
-            error: function () {
-                console.log("Erro na requisição ao gerar código!", "danger");
-            }
+      $.ajax({
+        url: this.configuracao.urlClinica,
+        method: "POST",
+        data: fd,
+        processData: false,
+        contentType: false
+      })
+        .done(function (resposta) {
+          $botao.prop("disabled", false).html("Ativar");
+          if ($.trim(resposta) === "sucesso") {
+            self.mostrarAlert("Conta ativada com sucesso!", "success");
+            self.estado.codigoGerado = false;
+            setTimeout(function () {
+              window.location.href = self.configuracao.urlLogin;
+            }, 1500);
+          } else {
+            $campoCodigo.addClass("is-invalid");
+            self.mostrarAlert(resposta, "danger");
+          }
+        })
+        .fail(function (xhr, status, erro) {
+          $botao.prop("disabled", false).html("Ativar");
+          console.error("Erro na ativação:", status, erro, xhr.responseText);
+          self.mostrarAlert("Erro na requisição de ativação!", "danger");
         });
-    });
+    }
+  };
 
-    //ATIVACAO
-    $("#btnAtivar").on("click", function (e) {
-        e.preventDefault();
+  $(function () {
+    moduloCadClinica.iniciar();
+  });
 
-        const btn = $(this);
-        const campoCodigo = $("#codigoCliente");
-        const inputCodigo = campoCodigo.val().trim();
-
-        const email = cli.email.val().trim();
-        const controller = "/z/index.php?uri=clinica"; //Axolote
-
-        if (geradoCod === false) {
-            mostrarAlert("Gere um código primeiro!", "danger");
-            btn.prop("disabled", false).html("Ativar");
-            return;
-        }
-
-        if (!inputCodigo) {
-            campoCodigo.addClass("is-invalid");
-            mostrarAlert("Digite o código enviado!", "danger");
-            btn.prop("disabled", false).html("Ativar");
-            return;
-        }
-
-        btn.prop("disabled", true).html("Ativando...");
-
-        const fd = new FormData();
-        fd.append("email", email);
-        fd.append("codigo", inputCodigo);
-        fd.append("acao", "ativar");
-
-        $.ajax({
-            url: controller, //Axolote
-            method: "POST",
-            data: fd,
-            processData: false,
-            contentType: false,
-            success: function (resposta) {
-                btn.prop("disabled", false).html("Ativar");
-
-                if (resposta.trim() === "sucesso") {
-                    mostrarAlert("Conta ativada com sucesso!", "success");
-                    geradoCod = false;
-                    mostrarTela("loginClinica");
-                } else {
-                    mostrarAlert(resposta, "danger");
-                    campoCodigo.addClass("is-invalid");
-                    btn.prop("disabled", false).html("Ativar");
-                }
-            },
-            error: function (xhr, status, error) {
-                btn.prop("disabled", false).html("Ativar");
-                console.error("Erro:", error);
-                mostrarAlert("Erro na requisição de ativação!", "danger");
-            }
-        });
-    });
-    $("input").on("input", function () {
-        $(this).removeClass("is-invalid");
-    });
-
-});
+})(jQuery, window.ElmoUtilitarios);

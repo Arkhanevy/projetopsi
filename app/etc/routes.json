@@ -23,15 +23,20 @@
 		"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
 		"errorPath" : "app/views/erro.php"
 	},
-	"cadastroproclin" : { 
-		"path" : "public/assets/css/cadProCli.css",
+	"loginCliente" : { 
+		"path" : "app/views/loginCliente.php",
 		"sessionKey": [{"idUsuario": false}], 
 		"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
 		"errorPath" : "app/views/erro.php"
 	},
-	
-	"cadastro": {
-		"path": "app/views/cadastro.php",
+	"loginClinica" : { 
+		"path" : "app/views/loginClinica.php",
+		"sessionKey": [{"idUsuario": false}], 
+		"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
+		"errorPath" : "app/views/erro.php"
+	},
+	"loginProfissional" : { 
+		"path" : "app/views/loginProfissional.php",
 		"sessionKey": [{"idUsuario": false}], 
 		"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
 		"errorPath" : "app/views/erro.php"
@@ -67,37 +72,21 @@
 	},
 	"infoServico": {
 		"path": "app/views/infoServico.php",
-		"sessionKey": [
-			{
-				"idUsuario": false
-			}
-		],
-		"sanitize": {
-			"requestVars": true,
-			"code": true,
-			"sql": true
-		},
+		"sessionKey": [{"idUsuario": false}],
+		"sanitize": {"requestVars": true,"code": true,"sql": true},
 		"errorPath": "app/views/erro.php"
 	},
 	"agendamentoCli": {
-		"path": "app/views/agendamentoCli.php",
-		"sessionKey": [
-			{
-				"idUsuario": false
-			}
-		],
-		"sanitize": {
-			"requestVars": true,
-			"code": true,
-			"sql": true
-		},
+		"path": "app/views/agendamentoCliente.php",
+		"sessionKey": [{"idUsuario": false}],
+		"sanitize": {"requestVars": true,"code": true,"sql": true},
 		"errorPath": "app/views/erro.php"
 	},
 	"consultasCli": {
-		"path": "app/views/consultaCli.php",
+		"path": "app/views/consultaCliente.php",
 		"sessionKey": [
 			{
-				"idUsuario": false
+				"idUsuario": true, "tipoUsuario": ["cliente"]
 			}
 		],
 		"sanitize": {
@@ -112,5 +101,5 @@
 					"sessionKey": [{"idUsuario": false}], 
 					"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
 					"errorPath" : "app/views/erro.php"
-				}
+	}
 }

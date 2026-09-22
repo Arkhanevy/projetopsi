@@ -12,7 +12,7 @@
  textarea.is-invalid, .form-select.is-invalid {
      border-color: #dc3545;
 }
- #cadastroClinica, #cadastroProfissional, #loginProfissional, #loginClinica, #esqueciForm, #ativacao, .cadastro {
+ #cadastroClinica, #cadastroProfissional, #esqueciForm, #ativacao, .cadastro {
      display: none;
 }
  h1 {
