@@ -1,12 +1,4 @@
 <?php
-/*require 'autoload.php';
-
-// Carrega manualmente as classes mais importantes
-require __DIR__ . '/app/models/servicos.php';
-require __DIR__ . '/app/models/cliente.php';
-require __DIR__ . '/app/models/clinica.php';
-require __DIR__ . '/app/models/profissional.php';*/
-
 use core\utils\Router;
 
 /**

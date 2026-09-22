@@ -2,7 +2,7 @@
 
 use core\database\DBQuery;
 use core\utils\CodeGenerator;
-use app\core\utils\Mail;
+use core\utils\Mail;
 
 $acao = $_POST['acao'] ?? '';
 
@@ -233,6 +233,7 @@ switch ($acao){
                 ];
                 $_SESSION['idUsuario'] = $profissional['pro_id'];
                 $_SESSION['tipoUsuario'] = 'profissional';
+
                 
                 echo "sucesso";
                 

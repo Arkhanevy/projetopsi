@@ -81,8 +81,6 @@ console.log("JS cadClinica carregado");
       this.elementos.$ibge = $("#ibgeClinica");
       this.elementos.$cidade = $("#cidadeClinica");
       this.elementos.$form = $("#cadastroClinica");
-
-
       this.elementos.$emailAtivacao = $("#emailAtivar");
       this.elementos.$codigo = $("#codigoCliente");
 
@@ -93,7 +91,6 @@ console.log("JS cadClinica carregado");
 
     registrarEventos: function () {
       var self = this;
-
       // Remove o estado de erro assim que o usuário volta a interagir com o campo.
       $(document).on("input change", ".form-control, .form-select, textarea", function () {
         $(this).removeClass("is-invalid");
@@ -304,7 +301,6 @@ console.log("JS cadClinica carregado");
       }
 
       $botao.prop("disabled", true).html("Ativando...");
-
       var fd = new FormData();
       fd.append("email", email);
       fd.append("codigo", codigoDigitado);

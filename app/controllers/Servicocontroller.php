@@ -1,4 +1,9 @@
 <?php
+if (!class_exists('servicos')) {
+    require_once __DIR__ . '/../models/servicos.php';
+}
+
+
 $acao = $_POST['acao'] ?? '';
 $servico = new servicos();
 

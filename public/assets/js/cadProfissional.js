@@ -1,10 +1,12 @@
 console.log("JS cadProfissional carregado");
 /* ============================================================
+<<<<<<< HEAD
    PÁGINA: cadProfissional (Cadastro / Ativação do Profissional)
    Depende de: jQuery, Bootstrap 5 (bundle JS), ElmoUtilitarios
    (ver /assets/js/utilitarios.js — deve ser carregado antes deste arquivo)
 
    Responsabilidades deste arquivo:
+<<<<<<< HEAD
    - Alternar entre as telas de cadastro e ativação
      do profissional.
    - Preencher automaticamente o endereço a partir do CEP (ViaCEP).
@@ -85,7 +87,6 @@ console.log("JS cadProfissional carregado");
       this.elementos.$registro = $("#registroProfissional");
       this.elementos.$form = $("#cadastroProfissional");
 
-
       this.elementos.$emailAtivacao = $("#emailAtivar");
       this.elementos.$codigo = $("#codigoCliente");
 
@@ -97,6 +98,16 @@ console.log("JS cadProfissional carregado");
     registrarEventos: function () {
       var self = this;
 
+      // Troca de telas
+      $(".logarProfissional").on("click", function (evento) {
+        evento.preventDefault();
+        self.mostrarTela("loginProfissional");
+      });
+
+      $(".cadastrarProfissional").on("click", function (evento) {
+        evento.preventDefault();
+        self.mostrarTela("cadastroProfissional");
+      });
       // Remove o estado de erro assim que o usuário volta a interagir com o campo.
       $(document).on("input change", ".form-control, .form-select, textarea", function () {
         $(this).removeClass("is-invalid");
@@ -178,7 +189,6 @@ console.log("JS cadProfissional carregado");
         this.mostrarAlert("CPF inválido!", "danger");
         return;
       }
-
       if (!Utilitarios.telefoneValido(el.$tel.val())) {
         el.$tel.addClass("is-invalid");
         $botao.prop("disabled", false).html("Cadastrar");
@@ -254,7 +264,6 @@ console.log("JS cadProfissional carregado");
           self.mostrarAlert("Erro na requisição!", "danger");
         });
     },
-
     /* CÓDIGO DE ATIVAÇÃO */
 
     gerarCodigo: function ($botao) {
@@ -280,7 +289,6 @@ console.log("JS cadProfissional carregado");
       var fd = new FormData();
       fd.append("email", email);
       fd.append("acao", "ReGerarCodigo");
-
       $.ajax({
         url: this.configuracao.urlProfissional,
         method: "POST",
@@ -321,7 +329,6 @@ console.log("JS cadProfissional carregado");
       }
 
       $botao.prop("disabled", true).html("Ativando...");
-
       var fd = new FormData();
       fd.append("email", email);
       fd.append("codigo", codigoDigitado);

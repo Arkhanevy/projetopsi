@@ -152,6 +152,7 @@ switch ($acao){
             $email = $_POST['email'] ?? '';
             $senha = $_POST['senhaLog'] ?? '';
             
+<<<<<<< HEAD
             //ANTES
             //$select = "clin_id,clin_nome,clin_email,clin_senha,clin_stat";
             
@@ -170,6 +171,13 @@ switch ($acao){
                 //$where = " WHERE clin_email = '" . $email . "'";
                 
                 //DEPOIS
+=======
+            $select = "cli_id,cli_nome,cli_email,cli_senha,cli_stat";
+                       
+            try {
+                $db = new DBQuery("cliente", $select, "");
+                
+>>>>>>> fcfdbbcf865e0c110dd74cd7bec620a6e8c3ca38
                 $where = " WHERE cli_email = '" . $email . "'";
                 
                 $resultado = $db->selectWhere($where);
@@ -183,7 +191,11 @@ switch ($acao){
                 //ANTES
                 //if (!$clinica) {
                 
-                //DEPOIS
+                //DEPOI
+                $cliente = $resultado->fetch(PDO::FETCH_ASSOC);
+                
+                ;
+
                 if (!$cliente) {
                     echo "E-mail não encontrado";
                     exit;
@@ -193,11 +205,13 @@ switch ($acao){
                 //if ($clinica['clin_stat'] != 'ativo') {
             
                 //DEPOIS
+
                 if ($cliente['cli_stat'] != 'ativo') {
                     echo "Conta não ativada";
                     exit;
                 }
                 
+
                 //ANTES
                 //if (!password_verify($senha, $clinica['clin_senha'])) {
                 
@@ -206,6 +220,7 @@ switch ($acao){
                     echo "Senha inválida";
                     exit;
                 }
+
                 
                 //ANTES
                 //$_SESSION['clinica'] = [
@@ -224,6 +239,7 @@ switch ($acao){
                 //FALAR COM A EVELYN
                 $_SESSION['idUsuario'] = $cliente['cli_id'];
                 $_SESSION['tipoUsuario'] = 'cliente';
+
                 
                 echo "sucesso";
                 
@@ -234,6 +250,7 @@ switch ($acao){
             }
             
             exit;
+
         case "verificarLogin": //EXPLICAR M
 
             header('Content-Type: application/json; charset=utf-8');
@@ -254,4 +271,6 @@ switch ($acao){
             exit;
     
             }
+            
+}
 ?>

@@ -24,15 +24,15 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
     public function cadastrar($id,$pro,$nome,$tipo,$desc,$dur,$inter,$val,$stat,$dia) {
         $camposServ = implode(',',$this->camposServ); // isso é só pra enviar no formato que o banco de dados pede, necessario?pode ser que não, assunto para depois
         $dados =[
-            $id,
-            $pro,
+            0,
+            $_SESSION['profissional']['id'],
             $nome,
             $tipo,
             $desc,
             $dur,
             $inter,
             $val,
-            $stat,
+            'ativo',
             $dia
         ];
         try {

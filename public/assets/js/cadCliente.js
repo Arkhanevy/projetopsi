@@ -1,13 +1,17 @@
 console.log("JS cadCliente carregado");
 /* ============================================================
+
    PÁGINA: cadCliente (Cadastro / Ativação do Cliente)
+
    Depende de: jQuery, Bootstrap 5 (bundle JS), ElmoUtilitarios
    (ver /assets/js/utilitarios.js — deve ser carregado antes deste arquivo)
 
    Responsabilidades deste arquivo:
+
    - Alternar entre as telas de cadastro e ativação do cliente.
    - Redirecionar para a página de login (loginCliente) após a ativação
      e para links antigos com ?tipo=login.
+
    - Validar e enviar o formulário de cadastro via AJAX (com upload
      da imagem de perfil).
    - Gerar/reenviar o código de ativação por e-mail.
@@ -23,6 +27,7 @@ console.log("JS cadCliente carregado");
     configuracao: {
       urlCliente: "/projetopsi/index.php?uri=cliente", //Axolote
       urlLogin: "index.php?uri=loginCliente"
+
     },
 
     /* ---------- Estado interno ---------- */
@@ -58,6 +63,7 @@ console.log("JS cadCliente carregado");
       this.telas = {
         cadastro: $("#cadastroCliente"),
         ativacao: $("#ativacao")
+
       };
 
       this.elementos.$alertContainer = $("#alertContainer");
@@ -75,6 +81,8 @@ console.log("JS cadCliente carregado");
       this.elementos.$senha = $("#senhaCliente");
       this.elementos.$form = $("#cadastroCliente");
 
+      this.elementos.$loginEmail = $("#emailLogin");
+      this.elementos.$loginSenha = $("#senhaLogin");
 
       this.elementos.$emailAtivacao = $("#emailAtivacao");
       this.elementos.$codigo = $("#codigoCliente");
@@ -82,6 +90,7 @@ console.log("JS cadCliente carregado");
       this.elementos.$botaoCadastrar = $("#btnCadastrar");
       this.elementos.$botaoCodigo = $("#btnCodigo");
       this.elementos.$botaoAtivar = $("#btnAtivar");
+
     },
 
     registrarEventos: function () {
@@ -105,6 +114,7 @@ console.log("JS cadCliente carregado");
         evento.preventDefault();
         self.ativarConta($(this));
       });
+
 
     },
 
@@ -312,9 +322,11 @@ console.log("JS cadCliente carregado");
           if ($.trim(resposta) === "sucesso") {
             self.mostrarAlert("Conta ativada com sucesso!", "success");
             self.estado.codigoGerado = false;
+
             setTimeout(function () {
               window.location.href = self.configuracao.urlLogin;
             }, 1500);
+
           } else {
             self.mostrarAlert(resposta, "danger");
           }
@@ -330,5 +342,6 @@ console.log("JS cadCliente carregado");
   $(function () {
     moduloCadCliente.iniciar();
   });
+
 
 })(jQuery, window.ElmoUtilitarios);
