@@ -1,6 +1,6 @@
 <?php
 
-namespace app\core\utils;
+namespace core\utils;
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

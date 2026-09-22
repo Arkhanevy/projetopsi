@@ -1,4 +1,9 @@
 <?php
+if (!class_exists('servicos')) {
+    require_once __DIR__ . '/../models/servicos.php';
+}
+
+
 $acao = $_POST['acao'] ?? '';
 $servico = new servicos();
 
@@ -7,10 +12,10 @@ switch ($acao){
         $cadastro = $servico->cadastrar(0, $_SESSION['id'], $_POST['nome'], $_POST['tipo'], $_POST['desc'], $_POST['dur'], $_POST['inter'], $_POST['val'], $_POST['stat'], $_POST['dia']);
         echo $cadastro;
         exit;
-    case "mostrarservico":
-        $mostrar = $servico->mostrardetalhes();
+    case "pao":
+        $mostrar = $servico->Mostrarservico();
         exit;
-    case 'mostrardetalhes':// vou mudar para detalhes
+    case 'MostrarServico':// vou mudar para detalhes
         if (empty($_SESSION['servico'])) {
             $_SESSION['servico'] = [
                 'ser_id' => '',       // ID do serviço
@@ -19,7 +24,7 @@ switch ($acao){
                 'ser_inter' => ''    // Intervalo em minutos
             ];
         }
-        $mostrar= $servico->MostrarDetalhes(1/*$_POST['ser_id']*/);
+        $mostrar= $servico->MostrarDetalhes(2/*$_POST['ser_id']*/);
         
         // Verifica se teve sucesso
         if ($mostrar['sucesso']) {

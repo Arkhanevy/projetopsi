@@ -2,7 +2,7 @@
 
 use core\database\DBQuery;
 use core\utils\CodeGenerator;
-use app\core\utils\Mail;
+use core\utils\Mail;
 
 $acao = $_POST['acao'] ?? '';
 
@@ -51,11 +51,11 @@ switch ($acao){
                 $_POST['username'],
                 password_hash($_POST['senha'],PASSWORD_BCRYPT),
                 $_POST['bio'],
-                'cxfoto',
+                'cxfoto',//$_POST['cxproFoto'],
                 $cod,
                 $_POST['dtNas'],
                 date('Y-m-d H:i:s'),
-                null, #PAULO
+                '',
                 "desativo",
                 $_POST['CPF'],
                 $_POST['CEP'],
