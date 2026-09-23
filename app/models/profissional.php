@@ -3,6 +3,7 @@
 use core\database\DBQuery;
 use core\utils\CodeGenerator;
 use core\utils\Mail;
+use core\database\Where;
 
 $acao = $_POST['acao'] ?? '';
 
@@ -245,5 +246,48 @@ switch ($acao){
                 
                 exit;
 
+        case "MostrarConsulta":
+            $campoSelect = "agnd_id,agnd_pro,profissional.pro_nome,agnd_cli,cliente.cli_nome,agnd_clin,clinica.clin_nome,agnd_ser,servico.ser_nome,agnd_dt,agnd_hrIni,agnd_hrTerm";
+            $campospro = "pro_id,pro_nome";
+            $campocli = "cli_id,cli_nome";
+            $camposClin = "clin_id,clin_nome";
+            $campoServ = "ser_id,ser_nome";
+            
+            
+            $agenda = new DBQuery('agenda', $campoSelect, 'agnd_id');
+            $profissional = new DBQuery('profissional', $campospro, 'pro_id');
+            $cliente = new DBQuery('cliente', $campocli, 'cli_id');
+            $clinica = new DBQuery('clinica', $camposClin, 'clin_id');
+            $servico = new DBQuery('servico', $campoServ, 'ser_id');
+            
+            
+            // Adicionar JOINS (ambos na tabela principal)
+            $agenda->addJoin('INNER', 'agnd_pro', $profissional, 'pro_id');
+            $agenda->addJoin('INNER', 'agnd_cli', $cliente, 'cli_id');
+            $agenda->addJoin('INNER', 'agnd_clin', $clinica, 'clin_id');
+            $agenda->addJoin('INNER', 'agnd_ser', $servico, 'ser_id');
+            
+            
+            
+            // Executar
+            $where = new Where();
+            $where->addCondition('AND', 'agnd_pro', '=', $_SESSION['profissional']['id']);
+            try {
+                $resultado = $agenda->selectFiltered($where);
+                if ($resultado) {
+                    echo json_encode( [
+                        'sucesso' => true,
+                        'dados' => $resultado->fetchAll(PDO::FETCH_ASSOC)
+                    ]);
+                } else {
+                    echo "erro ao inserir";
+                }
+            } catch (InvalidArgumentException $e) {
+                echo "Erro de validação: " . $e->getMessage();
+            } catch (\Exception $e) {
+                echo "Erro no banco: " . $e->getMessage();
+            };
+            
+            exit;
 }
 ?>

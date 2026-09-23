@@ -52,6 +52,16 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
     }
     public function Mostrarservico(){//tá porco mas não tô fazendo a parte de pesquisa ainda é só pra o agendamento que estou fazendo agr possa funcionar
         try {
+            $camposServ = [
+                $this->camposServ[0],
+                $this->camposServ[1],
+                $this->camposServ[2],
+                $this->camposServ[3],
+                $this->camposServ[4],
+                $this->camposServ[5],
+                $this->camposServ[8]
+            ];
+            
             $camposServ = implode(',',$this->camposServ);
             $mostrar = new DBQuery($this->table, $camposServ,$this->pimarykey );
             $resultado = $mostrar->select();

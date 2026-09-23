@@ -30,7 +30,7 @@ create table profissional ( -- tabela do perfil do profissional
     pro_senha varchar(255),-- senha do profissional
     pro_bio text,-- biografia do profissional
     pro_foto varchar(100),-- foto do profissional
-    pro_codVali int,-- codigo de validação do profissional
+    pro_codVali varchar(6),-- codigo de validação do profissional
     pro_dtNasc date,-- data de nascimento do profissional
     pro_dtCad datetime default current_timestamp,-- data de cadastro do profissional
     pro_dtDell datetime null,-- data de delete do profissional
@@ -52,7 +52,7 @@ create table cliente ( -- tabela do cliente
     cli_senha varchar(255),-- senha do cliente
     cli_bio text,-- biografia do cliente
     cli_foto varchar(100),-- foto do cliente
-    cli_codVali int,-- codigo de validação do cliente
+    cli_codVali varchar(6),-- codigo de validação do cliente
     cli_dtNasc date,-- data de nascimento do cliente
     cli_dtCad datetime default current_timestamp,-- data de cadastro do cliente
     cli_dtDell datetime null,-- data de delete
@@ -173,9 +173,9 @@ create table atendimento ( -- esse vai salvar pra fazer o relatorio e mander no 
     constraint fk_atd_ser foreign key (atd_ser) references servico(ser_id)  on delete cascade
 );
 
-select * from clinica ;
-update hr_servico set hrser_dia = 0 where hrser_id = '1';
-ALTER TABLE hr_servico MODIFY COLUMN hrser_dia int;
-INSERT INTO servico (ser_id, ser_pro, ser_nome, ser_tipo, ser_desc, ser_dur, ser_inter, ser_val, ser_stat, ser_dia) VALUES (0, 1, 'mao de pão', 'mãos', 'sua mão vira pão', 30, 10, 50.20, 'ativado', 'DOM');
+select * from profissional;
+update profissional set pro_email = 'esgts@fvs.ye', pro_codVali = 'pao' where cli_id = '1';
+ALTER TABLE cliente MODIFY COLUMN cli_codVali varchar(6);
+INSERT INTO servico (ser_id, ser_pro, ser_nome, ser_tipo, ser_desc, ser_dur, ser_inter, ser_val, ser_stat, ser_dia) VALUES (0, 1, 'mao de pão', 'mãos', 'sua mão vira pão', 30, 10, 50.20, 'ativado', 0);
 INSERT INTO hr_servico (hrser_id, hrser_pro, hrser_hora_inic, hrser_hora_term, hrser_dia) VALUES (0, 1, '08:00:00','18:00:00','1');
 INSERT INTO hr_excecao (hr_excecao_id, hr_excecao_pro, hr_excecao_dia, hr_excecao_trab, hr_excecao_ini, hr_excecao_term, hr_excecao_desc) VALUES (0, 1, '2026/08/10',false,null,null,'pão');
