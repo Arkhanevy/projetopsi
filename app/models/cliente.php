@@ -150,7 +150,6 @@ switch ($acao){
             
             //EVELYN LOGIN
         case "login":
-            
             $email = $_POST['email'] ?? '';
             $senha = $_POST['senhaLog'] ?? '';
             
@@ -177,10 +176,6 @@ switch ($acao){
                 //if (!$clinica) {
                 
                 //DEPOI
-                $cliente = $resultado->fetch(PDO::FETCH_ASSOC);
-                
-                ;
-
                 if (!$cliente) {
                     echo "E-mail não encontrado";
                     exit;
@@ -190,7 +185,6 @@ switch ($acao){
                 //if ($clinica['clin_stat'] != 'ativo') {
             
                 //DEPOIS
-
                 if ($cliente['cli_stat'] != 'ativo') {
                     echo "Conta não ativada";
                     exit;
@@ -256,6 +250,7 @@ switch ($acao){
             exit;
         case "MostrarConsulta":
             $campoSelect = "agnd_id,agnd_pro,profissional.pro_nome,agnd_cli,cliente.cli_nome,agnd_clin,clinica.clin_nome,agnd_ser,servico.ser_nome,agnd_dt,agnd_hrIni,agnd_hrTerm";
+            //$campoSelect = "agnd_id,agnd_pro,profissional.pro_nome,agnd_cli,cliente.cli_nome,agnd_ser,servico.ser_nome,agnd_dt,agnd_hrIni,agnd_hrTerm";
             $campospro = "pro_id,pro_nome";
             $campocli = "cli_id,cli_nome";
             $camposClin = "clin_id,clin_nome";

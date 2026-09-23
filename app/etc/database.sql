@@ -149,6 +149,7 @@ create table agenda (-- aqui vai estar os horarios das consultas
     agnd_id int primary key auto_increment, -- id dessa tabela
     agnd_pro int not null,-- id do profissional nessa tabela
     agnd_cli int not null,-- id do cliente nessa tabela
+    agnd_clin int,-- id do cliente nessa tabela
     agnd_ser int not null,-- id do servico nessa tabela
     /*agnd_sala int not null,-- id da sala nessa tabela*/
     agnd_dt date, -- data da consulta
@@ -156,6 +157,7 @@ create table agenda (-- aqui vai estar os horarios das consultas
     agnd_hrTerm time, -- data de termino da consulta
     constraint fk_agnd_pro foreign key (agnd_pro) references profissional(pro_id),
 	constraint fk_agnd_cli foreign key (agnd_cli) references cliente(cli_id),
+	constraint fk_agnd_clin foreign key (agnd_cli) references clinica(clin_id),
     constraint fk_agnd_ser foreign key (agnd_ser) references servico(ser_id)
     /*constraint fk_agnd_sal foreign key (agnd_sala) references sala(sala_id)*/ 
 );
