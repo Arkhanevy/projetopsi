@@ -1,5 +1,4 @@
 <?php
-
 namespace core\database;
 
 use core\utils\Sanitize;
