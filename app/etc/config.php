@@ -65,17 +65,17 @@ if ($showErrors){
 
 
 
-/*$config['database']['host']		= 'localhost';
+$config['database']['host']		= 'localhost';
 $config['database']['schema']	= 'dbelmo';
 $config['database']['user']		= 'root';
 $config['database']['pass']		= '';
-$config['database']['port']		= '3306';*/
+$config['database']['port']		= '3306';
 
-$config['database']['host']		= 'localhost';
+/*$config['database']['host']		= 'localhost';
 $config['database']['schema']	= 'dbelmo';
 $config['database']['user']		= 'tcc_app';//'tcc_app';
 $config['database']['pass']		= 'tcc@2026';//'tcc@2026';
-$config['database']['port']		= '3306';
+$config['database']['port']		= '3306';*/
 
 $config['email']['host']	    = 'sandbox.smtp.mailtrap.io';
 $config['email']['port']	    =  2525;

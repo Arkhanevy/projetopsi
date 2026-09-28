@@ -1,11 +1,45 @@
 <?php 
+namespace models;
 
-use core\database\DBQuery;
-use core\utils\CodeGenerator;
-use core\utils\Mail;
-use core\database\Where;
+//use core\database\DBQuery;
+//use core\utils\CodeGenerator;
+//use core\utils\Mail;
+//use core\database\Where;
+use models\usuario;
 
-$acao = $_POST['acao'] ?? '';
+
+class profissional extends usuario {
+    public function __construct($table,$campo,$primary) {
+        parent::__construct($table,$campo,$primary);}
+
+    public function Cadastrarprofissional($nome,$email,$username,$senha,$bio,$dtNas,$CPF,$CEP,$telefone,$genero,$registro) {
+        $dados =[
+            0,
+            $nome,
+            $email,
+            $username,
+            password_hash($senha,PASSWORD_BCRYPT),
+            $senha,
+            $bio,
+            'cxfoto',
+            $dtNas,
+            date('Y-m-d H:i:s'),
+            null, #PAULO
+            "desativo",
+            $CPF,
+            $CEP,
+            $telefone,
+            $genero,
+            $registro,
+            0,
+            0
+        ];
+        return $this->Cadastrar($dados);
+    }
+ 
+}
+
+/*$acao = $_POST['acao'] ?? '';
 
 $campospro =[
     'pro_id',
@@ -33,17 +67,17 @@ switch ($acao){
         case "cadastrar":
             $generator = new CodeGenerator();
             $cod = $generator->run(6);
-            /*$assunto = 'codigo de validação';
-            $body = "!DOCTYPE html>
-                    <html lang='pt-BR'>
-                    <head>
-                        <meta charset='UTF-8'>
-                        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                    </head>
-                    <body>
-                        <p> seu codigo é: ".$cod."</p>
-                    </body>
-                    </html>";*/
+            //$assunto = 'codigo de validação';
+            //$body = "!DOCTYPE html>
+            //      <html lang='pt-BR'>
+            //      <head>
+            //          <meta charset='UTF-8'>
+            //          <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            //      </head>
+            //      <body>
+            //          <p> seu codigo é: ".$cod."</p>
+            //      </body>
+            //      </html>";
             
             $dados =[
                 0,
@@ -74,8 +108,8 @@ switch ($acao){
                 
                 if ($resultado) {
                     echo "sucesso";
-                    /*$email = new Mail($dados[2], $assunto, $body);
-                    $email ->send();*/
+                    //$email = new Mail($dados[2], $assunto, $body);
+                    //$email ->send();
                 } else {
                     echo "erro ao inserir";
                 }
@@ -91,25 +125,25 @@ switch ($acao){
             $cod = $generator->run(6);
             $dados = [$_POST['email'],$cod];
             $campospro = implode(',',[$campospro[2], $campospro[7]]);
-            /*$assunto = 'codigo de validação';
-            $body = "!DOCTYPE html>
-                    <html lang='pt-BR'>
-                    <head>
-                        <meta charset='UTF-8'>
-                        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                    </head>
-                    <body>
-                        <p> seu codigo é: ".$cod."</p>
-                    </body>
-                    </html>";*/
+            //$assunto = 'codigo de validação';
+            //$body = "!DOCTYPE html>
+            //      <html lang='pt-BR'>
+            //      <head>
+            //          <meta charset='UTF-8'>
+            //          <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            //      </head>
+            //      <body>
+            //          <p> seu codigo é: ".$cod."</p>
+            //      </body>
+            //       </html>";
             
             try {
                 $codigo = new DBQuery("profissional", $campospro, ['pro_email']);
                 $resultado = $codigo->update($dados);
                 if ($resultado) {
                     echo "sucesso";
-                    /*$email = new Mail($dados[2], $assunto, $body);
-                    $email ->send();*/
+                    //$email = new Mail($dados[2], $assunto, $body);
+                    //$email ->send();
                 } else {
                     echo "erro ao inserir";
                 }
@@ -124,8 +158,9 @@ switch ($acao){
             $cod = $_POST['codigo'];
             
             $select = $campospro[7];
-            $db = new DBQuery("profissional", $select, '');
-            $where = " where pro_email = '" . $email . "'";
+            $db = new DBQuery("profissional", $select, 'pro_email');
+            $where = new Where();
+            $where->addCondition('AND', 'pro_email', '=',$email);
             $resultado = $db->selectWhere($where);
             $registro = $resultado->fetch(PDO::FETCH_ASSOC);
             
@@ -172,7 +207,7 @@ switch ($acao){
             //$select = "clin_id,clin_nome,clin_email,clin_senha,clin_stat";
             
             //DEPOIS
-            $select = "pro_id,pro_nome,pro_email,pro_senha,pro_stat";
+            $select = "";
             
             try {
                 
@@ -180,13 +215,14 @@ switch ($acao){
                 //$db = new DBQuery("clinica", $select, "");
                 
                 //DEPOIS
-                $db = new DBQuery("profissional", $select, "");
+                $db = new DBQuery("profissional", $select, "pro_email");
                 
                 //ANTES
                 //$where = " WHERE clin_email = '" . $email . "'";
                 
                 //DEPOIS
-                $where = " WHERE pro_email = '" . $email . "'";
+                $where = new Where();
+                $where->addCondition('AND', 'pro_email', '=',$email);
                 
                 $resultado = $db->selectWhere($where);
                 
@@ -289,5 +325,5 @@ switch ($acao){
             };
             
             exit;
-}
+}*/
 ?>

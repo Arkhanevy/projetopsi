@@ -41,22 +41,22 @@
 		"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
 		"errorPath" : "app/views/erro.php"
 	},
+	
 	"profissional": {
-    	"path": "app/models/profissional.php",
+    	"path": "app/controllers/profissionalcontroller.php",
 		"sessionKey": [{"idUsuario": false}], 
 		"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
 		"errorPath" : "app/views/erro.php"
 	},
-
 	"clinica": {
-		"path": "app/models/clinica.php",
+		"path": "app/controllers/clinicacontroller.php",
 		"sessionKey": [{"idUsuario": false}], 
 		"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
 		"errorPath" : "app/views/erro.php"
 	},
 
 	"cliente": {
-    	"path": "app/models/cliente.php",
+    	"path": "app/controllers/clientecontroller.php",
 		"sessionKey": [{"idUsuario": false}], 
 		"sanitize"  : {"requestVars" : true, "code" : true, "sql" : true},
 		"errorPath" : "app/views/erro.php"

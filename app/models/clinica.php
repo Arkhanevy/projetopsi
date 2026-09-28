@@ -1,10 +1,40 @@
 <?php 
+namespace models;
+//use core\database\DBQuery;
+//use core\utils\CodeGenerator;
+//use app\core\utils\Mail;
+//use core\database\Where;
+use models\usuario;
 
-use core\database\DBQuery;
-use core\utils\CodeGenerator;
-use app\core\utils\Mail;
 
-$acao = $_POST['acao'] ?? '';
+class clinica extends usuario {
+    public function __construct($table,$campo,$primary) {
+        parent::__construct($table,$campo,$primary);}
+        
+        public function Cadastrarclinica($nome,$email,$username,$senha,$bio,$CNPJ,$CEP,$telefone) {
+            $dados =[
+                0,
+                $nome,
+                $email,
+                $username,
+                password_hash($senha,PASSWORD_BCRYPT),
+                $bio,
+                'cxfoto',//$cxproFoto,
+                0,
+                date('Y-m-d H:i:s'),
+                null, #PAULO
+                "desativo",
+                $CNPJ,
+                $CEP,
+                $telefone,
+                0
+            ];
+            return $this->Cadastrar($dados);
+        }
+        
+}
+
+/*$acao = $_POST['acao'] ?? '';
 
 $camposclin =[
     'clin_id',
@@ -21,23 +51,23 @@ $camposclin =[
     'clin_cnpj',
     'clin_cep',
     'clin_tel',
-    'clin_notif',];
+    'clin_notif'];
 
     
 switch ($acao){
         case "cadastrar":
             $generator = new CodeGenerator();
             $cod = $generator->run(6);
-            /*$assunto = 'codigo de validação';
-            $body = "!DOCTYPE html>
-                    <html lang='pt-BR'>
-                    <head>
-                        <meta charset='UTF-8'>
-                        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                    </head>
-                    <body>
-                    </body>
-                    </html>";*/
+          //$assunto = 'codigo de validação';
+          //$body = "!DOCTYPE html>
+          //        <html lang='pt-BR'>
+          //        <head>
+          //            <meta charset='UTF-8'>
+          //            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+          //        </head>
+          //        <body>
+          //        </body>
+          //        </html>";  
             
             $dados =[
                 0,
@@ -64,8 +94,8 @@ switch ($acao){
                 
                 if ($resultado) {
                     echo "sucesso";
-                    /*$email = new Mail($dados[2], $assunto, $body);
-                    $email ->send();*/
+                    //$email = new Mail($dados[2], $assunto, $body);
+                   // $email ->send();  
                 } else {
                     echo "erro ao inserir";
                 }
@@ -188,5 +218,5 @@ switch ($acao){
             }
             
             exit;
-}
+}*/
 ?>

@@ -1,8 +1,14 @@
 <?php 
+namespace models;
 
 use core\database\DBQuery;
 use core\utils\CodeGenerator;
-use app\core\utils\Mail;
+use core\utils\Mail;
+use core\database\Where;
+use PDO;
+use InvalidArgumentException;
+use DateTime;
+use DateInterval;
 
 class servicos { // a classe que vai fazer todas as operações relacionadas a serviços, mas nãa herda nada pq nem sei como faz mas pretendo fazer herdar
     private $camposServ =[
@@ -80,12 +86,12 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
         } catch (InvalidArgumentException $e) {
             return [
                 'sucesso' => false,
-                'erro' => 'Erro de validação: ' . $e->getMessage() . $where
+                'erro' => 'Erro de validação: ' . $e->getMessage()
             ];
         } catch (\Exception $e) {
             return [
                 'sucesso' => false,
-                'erro' => 'Erro no banco: ' . $e->getMessage() . $where
+                'erro' => 'Erro no banco: ' . $e->getMessage()
             ];
         }
     }
@@ -94,7 +100,8 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
         $camposServ = implode(',',$this->camposServ); 
             try {
                 $mostrar = new DBQuery($this->table, $camposServ,$this->pimarykey );
-                $where = "WHERE ser_id = ". $id;
+                $where = new Where();
+                $where->addCondition('AND', 'ser_id', '=',$id);
                 $resultado = $mostrar->selectWhere($where);
                 
                 if ($resultado) {
@@ -111,19 +118,20 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
             } catch (InvalidArgumentException $e) {
                 return [
                     'sucesso' => false,
-                    'erro' => 'Erro de validação: ' . $e->getMessage() . $where
+                    'erro' => 'Erro de validação: ' . $e->getMessage()
                 ];
             } catch (\Exception $e) {
                 return [
                     'sucesso' => false,
-                    'erro' => 'Erro no banco: ' . $e->getMessage() . $where
+                    'erro' => 'Erro no banco: ' . $e->getMessage()
                 ];
             }
     }
        private function GetDiaTrabalho($pro){
            try {
                $mostrar = new DBQuery('hr_servico', 'hrser_dia','hrser_pro' );// pega os dias que trabalha
-               $where = "WHERE hrser_pro = ".$pro;
+               $where = new Where();
+               $where->addCondition('AND', 'hrser_pro', '=', $pro);
                $resultado = $mostrar->selectWhere($where);
                
                if ($resultado) {
@@ -140,7 +148,8 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
        private function GetExcecaotrabalho($pro) {
            try {
                $mostrar = new DBQuery('hr_excecao', 'hr_excecao_dia,hr_excecao_ini','hr_excecao_pro' );//pega os dias de exeção
-               $where = "WHERE hr_excecao_pro = ".$pro;
+               $where = new Where();
+               $where->addCondition('AND', 'hr_exececao_pro', '=', $pro);
                $resultado = $mostrar->selectWhere($where);
                
                if ($resultado) {
@@ -173,7 +182,8 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                $dsem = new DateTime($dia);
                $dsem = $dsem->format('w');
                $rotina = new DBQuery('hr_servico', 'hrser_hora_inic,hrser_hora_term','hrser_dia' );
-               $where = "WHERE hrser_dia = '".$dsem ."'";
+               $where = new Where();
+               $where->addCondition('AND', 'hrser_dia', '=', $dsem);
                $resultado = $rotina->selectWhere($where);
                    if ($resultado) {
                        $dados = $resultado->fetch(PDO::FETCH_ASSOC);
@@ -181,7 +191,8 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                        return $dados;
                    } else {
                        $excecao = new DBQuery('hr_excecao', 'hr_excecao_ini,hr_excecao_term','hr_excecao_dia' );
-                       $where = "WHERE hrser_dia = '".$dia ."'";
+                       $where = new Where();
+                       $where->addCondition('AND', 'hr_excecao_dia', '=', $dia);
                        $resultado = $excecao->selectWhere($where);
                        if ($resultado) {
                            $dados = $resultado->fetch(PDO::FETCH_ASSOC);
@@ -200,7 +211,8 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
         private function Agenda($dia){
             try {
                 $mostrar = new DBQuery('agenda', 'agnd_hrIni,agnd_hrTerm','agnd_dt' );
-                $where = "WHERE agnd_dt = '".$dia."'";
+                $where = new Where();
+                $where->addCondition('AND', 'agnd_dt', '=', $dia);
                 $resultado = $mostrar->selectWhere($where);
                 
                 if ($resultado) {

@@ -13,7 +13,7 @@ switch ($acao){
         echo $cadastro;
         exit;
     case "mostrarservico":
-        $mostrar = $servico->mostrardetalhes();
+        $mostrar = $servico->Mostrarservico();
         exit;
     case 'mostrardetalhes':// vou mudar para detalhes
         if (empty($_SESSION['servico'])) {
@@ -24,7 +24,7 @@ switch ($acao){
                 'ser_inter' => ''    // Intervalo em minutos
             ];
         }
-        $mostrar= $servico->MostrarDetalhes(1/*$_POST['ser_id']*/);
+        $mostrar= $servico->MostrarDetalhes($_POST['ser_id']);
         
         // Verifica se teve sucesso
         if ($mostrar['sucesso']) {
