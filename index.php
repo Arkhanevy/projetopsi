@@ -1,7 +1,7 @@
 <?php
 use core\utils\Router;
 
-/**
+/** CAPIVARA
  * index.php
  * @package ZaitTinyFrameworkPHP
  * @author  Msc Cleber Silva de Oliveira, Yossef Zait
