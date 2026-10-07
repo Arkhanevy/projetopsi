@@ -1,5 +1,6 @@
 <?php
 use models\profissional;
+use models\servicos;
 
 $acao = $_POST['acao'] ?? '';
 $campos =[
@@ -55,4 +56,44 @@ switch ($acao){
         $resultado = $profissional->MostrarConsulta();
         echo json_encode($resultado);
         exit;
+    case "PegarPerfil":
+        $campospro = [$campos[0],$campos[1],$campos[5]];
+        $profissional = new profissional('profissional', $campospro, $campospro[0]);
+        $servico = new servicos();
+        
+        $properfil = $profissional->PegarPerfil();
+        if ($properfil['sucesso'] === false) {
+            echo json_encode([
+                "sucesso" => false,
+                "erro" => $properfil['erro']
+            ]);
+            exit;
+        }
+        
+        $proHrser = $profissional->pegarHrser();
+        if ($proHrser['sucesso'] === false) {
+            echo json_encode([
+                "sucesso" => false,
+                "erro" => $proHrser['erro']
+            ]);
+            exit;
+        }
+        
+        $proSer = $servico->MeusServicos();
+        if ($proSer['sucesso'] === false) {
+            echo json_encode([
+                "sucesso" => false,
+                "erro" => $proSer['erro']
+            ]);
+            exit;
+        }
+        
+        echo json_encode([
+            'sucesso' => true,
+            'dados1' => $properfil['dados'],
+            'dados2' => $proHrser['dados'],
+            'dados3' => $proSer['dados']
+        ]);
+        exit;
+        
 }

@@ -2,13 +2,7 @@
 namespace models;
 
 use core\database\DBQuery;
-use core\utils\CodeGenerator;
-use core\utils\Mail;
 use core\database\Where;
-use PDO;
-use InvalidArgumentException;
-use DateTime;
-use DateInterval;
 
 class servicos { // a classe que vai fazer todas as operações relacionadas a serviços, mas nãa herda nada pq nem sei como faz mas pretendo fazer herdar
     private $camposServ =[
@@ -50,7 +44,7 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
             } else {
                 return "erro ao inserir";
             }
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             return "Erro de validação: " . $e->getMessage();
         } catch (\Exception $e) {
             return "Erro no banco: " . $e->getMessage();
@@ -75,7 +69,7 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
             if ($resultado) {
                 return [
                     'sucesso' => true,
-                    'dados' => $resultado->fetchAll(PDO::FETCH_ASSOC)
+                    'dados' => $resultado->fetchAll(\PDO::FETCH_ASSOC)
                 ];
             }else {
                 return [
@@ -83,7 +77,7 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                     'erro' => 'Erro ao resgatar informação'
                 ];
             }
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             return [
                 'sucesso' => false,
                 'erro' => 'Erro de validação: ' . $e->getMessage()
@@ -102,12 +96,13 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                 $mostrar = new DBQuery($this->table, $camposServ,$this->pimarykey );
                 $where = new Where();
                 $where->addCondition('AND', 'ser_id', '=',$id);
+                $where = $where->build();
                 $resultado = $mostrar->selectWhere($where);
                 
                 if ($resultado) {
                     return [
                         'sucesso' => true,
-                        'dados' => $resultado->fetchAll(PDO::FETCH_ASSOC)
+                        'dados' => $resultado->fetchAll(\PDO::FETCH_ASSOC)
                     ];
                 }else {
                     return [
@@ -115,7 +110,7 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                         'erro' => 'Erro ao resgatar informação'
                     ];
                 }
-            } catch (InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 return [
                     'sucesso' => false,
                     'erro' => 'Erro de validação: ' . $e->getMessage()
@@ -127,19 +122,53 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                 ];
             }
     }
+    
+    public function MeusServicos() {
+        $camposServ = implode(',',$this->camposServ);
+        try {
+            $mostrar = new DBQuery($this->table, $camposServ,$this->pimarykey );
+            $where = new Where();
+            $where->addCondition('AND', 'ser_pro', '=',$_SESSION['profissional']['id']);
+            $where = $where->build();
+            $resultado = $mostrar->selectWhere($where);
+            
+            if ($resultado) {
+                return [
+                    'sucesso' => true,
+                    'dados' => $resultado->fetchAll(\PDO::FETCH_ASSOC)
+                ];
+            }else {
+                return [
+                    'sucesso' => false,
+                    'erro' => 'Erro ao resgatar informação'
+                ];
+            }
+        } catch (\InvalidArgumentException $e) {
+            return [
+                'sucesso' => false,
+                'erro' => 'Erro de validação: ' . $e->getMessage()
+            ];
+        } catch (\Exception $e) {
+            return [
+                'sucesso' => false,
+                'erro' => 'Erro no banco: ' . $e->getMessage()
+            ];
+        }
+    }
        private function GetDiaTrabalho($pro){
            try {
                $mostrar = new DBQuery('hr_servico', 'hrser_dia','hrser_pro' );// pega os dias que trabalha
                $where = new Where();
                $where->addCondition('AND', 'hrser_pro', '=', $pro);
+               $where = $where->build();
                $resultado = $mostrar->selectWhere($where);
                
                if ($resultado) {
-                   return  $resultado->fetchAll(PDO::FETCH_ASSOC);
+                   return  $resultado->fetchAll(\PDO::FETCH_ASSOC);
                } else {
                    return "erro ao resgatar a informação";
                }
-           } catch (InvalidArgumentException $e) {
+           } catch (\InvalidArgumentException $e) {
                return "Erro de validação: " . $e->getMessage();
            } catch (\Exception $e) {
                return "Erro no banco: " . $e->getMessage();
@@ -150,21 +179,22 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                $mostrar = new DBQuery('hr_excecao', 'hr_excecao_dia,hr_excecao_ini','hr_excecao_pro' );//pega os dias de exeção
                $where = new Where();
                $where->addCondition('AND', 'hr_exececao_pro', '=', $pro);
+               $where = $where->build();
                $resultado = $mostrar->selectWhere($where);
                
                if ($resultado) {
-                   return  $resultado->fetchAll(PDO::FETCH_ASSOC);
+                   return  $resultado->fetchAll(\PDO::FETCH_ASSOC);
                } else {
                    return "erro ao resgatar a informação";
                }
-           } catch (InvalidArgumentException $e) {
+           } catch (\InvalidArgumentException $e) {
                return "Erro de validação: " . $e->getMessage();
            } catch (\Exception $e) {
                return "Erro no banco: " . $e->getMessage();
            }
        }
        private function dias($ano,$mes,$dia){
-           $data = new DateTime("$ano-$mes-$dia");//volta uma lista dos dias
+           $data = new \DateTime("$ano-$mes-$dia");//volta uma lista dos dias
            $ultimoDia = $data->format('t');
            $dias = [];
            for ($i = 1; $i <= $ultimoDia; $i++) {
@@ -179,30 +209,32 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
        }
        private function PegarPeriodo($dia) {
            try {
-               $dsem = new DateTime($dia);
+               $dsem = new \DateTime($dia);
                $dsem = $dsem->format('w');
                $rotina = new DBQuery('hr_servico', 'hrser_hora_inic,hrser_hora_term','hrser_dia' );
                $where = new Where();
                $where->addCondition('AND', 'hrser_dia', '=', $dsem);
+               $where = $where->build();
                $resultado = $rotina->selectWhere($where);
                    if ($resultado) {
-                       $dados = $resultado->fetch(PDO::FETCH_ASSOC);
+                       $dados = $resultado->fetch(\PDO::FETCH_ASSOC);
                        $dados = ['inicio' => $dados['hrser_hora_inic'],'fim' => $dados['hrser_hora_term']];
                        return $dados;
                    } else {
                        $excecao = new DBQuery('hr_excecao', 'hr_excecao_ini,hr_excecao_term','hr_excecao_dia' );
                        $where = new Where();
                        $where->addCondition('AND', 'hr_excecao_dia', '=', $dia);
+                       $where = $where->build();
                        $resultado = $excecao->selectWhere($where);
                        if ($resultado) {
-                           $dados = $resultado->fetch(PDO::FETCH_ASSOC);
+                           $dados = $resultado->fetch(\PDO::FETCH_ASSOC);
                            $dados = array_map(fn($row) => ['inicio' => $row['hr_excecao_ini'],'fim' => $row['hr_excecao_term'] ], $dados);
                            return $dados;
                        } else {
                            return "erro ao resgatar a informação";
                        }
                    }
-               } catch (InvalidArgumentException $e) {
+               } catch (\InvalidArgumentException $e) {
                    return "Erro de validação: " . $e->getMessage();
                } catch (\Exception $e) {
                    return "Erro no banco: " . $e->getMessage();
@@ -213,15 +245,16 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                 $mostrar = new DBQuery('agenda', 'agnd_hrIni,agnd_hrTerm','agnd_dt' );
                 $where = new Where();
                 $where->addCondition('AND', 'agnd_dt', '=', $dia);
+                $where = $where->build();
                 $resultado = $mostrar->selectWhere($where);
                 
                 if ($resultado) {
-                    return $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    return $resultado->fetchAll(\PDO::FETCH_ASSOC);
                     
                 } else {
                     return "erro ao resgatar a informação";
                 }
-            } catch (InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 return "Erro de validação: " . $e->getMessage();
             } catch (\Exception $e) {
                 return "Erro no banco: " . $e->getMessage();
@@ -232,7 +265,7 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
             $hrser = $this->GetDiaTrabalho($pro);
             $exce = $this->GetExcecaotrabalho($pro);
             $dias = $this->dias($ano,$mes,$dia);
-            $atual = new DateTime("$ano-$mes-$dia");
+            $atual = new \DateTime("$ano-$mes-$dia");
             
             $disponivel = [];
             $folga = [];
@@ -241,12 +274,12 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
             $exceT = [];
             
             if (is_array($hrser) && is_array($dias) && (is_array($exce) || empty($exce))) {
-                $exceT = array_map(fn($e) => new DateTime($e['hr_excecao_dia']), array_filter($exce, fn($e) => $e['hr_excecao_ini']));
-                $exceF = array_map(fn($e) => new DateTime($e['hr_excecao_dia']), array_filter($exce, fn($e) => !$e['hr_excecao_ini']));
+                $exceT = array_map(fn($e) => new \DateTime($e['hr_excecao_dia']), array_filter($exce, fn($e) => $e['hr_excecao_ini']));
+                $exceF = array_map(fn($e) => new \DateTime($e['hr_excecao_dia']), array_filter($exce, fn($e) => !$e['hr_excecao_ini']));
                 $hrser = array_map(fn($e) => $e['hrser_dia'], $hrser);
 
                 foreach ($dias as $data) {
-                    $dt = new DateTime($data['data']);
+                    $dt = new \DateTime($data['data']);
                     $dtsemana = (int)$dt->format('w');
 
                     if ($dt < $atual)  {
@@ -302,13 +335,13 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
             if (is_array($periodo) && is_array($agenda)) {
                 
                 $horarios = [];
-                $duracao = new DateInterval('PT'.($dur + $inter).'M'); 
-                $intervalo = new DateInterval('PT'.($inter).'M'); 
+                $duracao = new \DateInterval('PT'.($dur + $inter).'M'); 
+                $intervalo = new \DateInterval('PT'.($inter).'M'); 
                 
                 
                 
-                $Inper = DateTime::createFromFormat('H:i:s', $periodo['inicio']);
-                $termper = DateTime::createFromFormat('H:i:s', $periodo['fim']);
+                $Inper = \DateTime::createFromFormat('H:i:s', $periodo['inicio']);
+                $termper = \DateTime::createFromFormat('H:i:s', $periodo['fim']);
                 
                 $hr = $Inper;
                 
@@ -330,15 +363,15 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                 
                 $horarios = array_filter($horarios, function($slot) use ($agenda, $intervalo) {
                     foreach ($agenda as $agnd) {
-                        $agnd_ini = DateTime::createFromFormat('H:i', $agnd['agnd_hrIni']);
-                        $agnd_term = DateTime::createFromFormat('H:i', $agnd['agnd_hrTerm']);
+                        $agnd_ini = \DateTime::createFromFormat('H:i', $agnd['agnd_hrIni']);
+                        $agnd_term = \DateTime::createFromFormat('H:i', $agnd['agnd_hrTerm']);
                        
                         
                         $agnd_ini->sub($intervalo); 
                         $agnd_term->add($intervalo); 
                         
-                        $slot_ini = DateTime::createFromFormat('H:i', $slot['inicio']);
-                        $slot_term = DateTime::createFromFormat('H:i', $slot['termino']);
+                        $slot_ini = \DateTime::createFromFormat('H:i', $slot['inicio']);
+                        $slot_term = \DateTime::createFromFormat('H:i', $slot['termino']);
                         
                         $naoColide = ($slot_term < $agnd_ini || $slot_ini > $agnd_term);
                         
@@ -386,7 +419,7 @@ class servicos { // a classe que vai fazer todas as operações relacionadas a s
                 } else {
                     return "erro ao inserir";
                 }
-            } catch (InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 return "Erro de validação: " . $e->getMessage();
             } catch (\Exception $e) {
                 return "Erro no banco: " . $e->getMessage();

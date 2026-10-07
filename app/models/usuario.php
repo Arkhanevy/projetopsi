@@ -144,13 +144,12 @@ class usuario {
                 'sucesso' => false,
                 'mensagem' => "Senha inválida"];
         }
-        $_SESSION[$this->table] = [
-            'id'    => $usuario[$this->campos[0]],
+        $_SESSION['usuario'] = [
+            'idUsuario'    => $usuario[$this->campos[0]],
             'nome'  => $usuario[$this->campos[1]],
-            'email' => $usuario[$this->campos[2]]
+            'email' => $usuario[$this->campos[2]],
+            'tipoUsuario' => $this->table
         ];
-        $_SESSION['idUsuario'] = $usuario[$this->campos[0]];
-        $_SESSION['tipoUsuario'] = $usuario[$this->table];
         return ['sucesso' => true];   
     }
     
@@ -192,6 +191,24 @@ class usuario {
                 'mensagem' => $e->getMessage()];
         };
         
+    }
+    
+    public function PegarPerfil() {
+        $camposStr = implode(',', $this->campos);
+        $usuario = new DBQuery($this->table, $camposStr, $this->primary);
+        $where = new Where();
+        $where->addCondition('AND', $this->primary, '=', $_SESSION['usuario']['idUsuario']);
+        $where = $where->build();
+        try {
+            $resultado = $usuario->selectWhere($where);
+            return [
+                'sucesso' => true,
+                'dados' => $resultado->fetchAll(\PDO::FETCH_ASSOC)
+            ];
+        } catch (\Exception $e) {
+            return ['sucesso' => false,
+                'mensagem' => $e->getMessage()];
+        }
     }
 }  
 ?>

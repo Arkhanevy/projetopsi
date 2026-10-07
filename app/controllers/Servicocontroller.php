@@ -1,7 +1,5 @@
 <?php
-if (!class_exists('servicos')) {
-    require_once __DIR__ . '/../models/servicos.php';
-}
+use models\servicos;
 
 
 $acao = $_POST['acao'] ?? '';
