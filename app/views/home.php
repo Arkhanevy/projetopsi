@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Amanda Imóveis - Home</title>
+  <title>PodoPsi - Home</title>
   <link rel="stylesheet" href="public/assets/css/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" type="text/css" href="public/assets/css/bootstrap.min.css">

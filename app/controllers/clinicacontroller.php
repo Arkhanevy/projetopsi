@@ -1,3 +1,4 @@
+
 <?php
 use models\clinica;
 
@@ -50,5 +51,32 @@ switch ($acao){
         $clinica = new clinica('clinica', $campo, $campo);
         $resultado = $clinica->MostrarConsulta();
         echo json_encode($resultado);
+        exit;
+    case "pegarinfo":
+        $camposclin = [$campos[0],$campos[1],$campos[5],$campos[12]];
+        $clinica = new clinica('clinica', $camposclin, $camposclin[0]);
+        
+        $clinperfil = $clinica->PegarPerfil();
+        if ($clinperfil['sucesso'] === false) {
+            echo json_encode([
+                "sucesso" => false,
+                "erro" => $clinperfil['erro']
+            ]);
+            exit;
+        }
+        
+        $proHrser = $clinica->pegarHrser();
+        if ($proHrser['sucesso'] === false) {
+            echo json_encode([
+                "sucesso" => false,
+                "erro" => $proHrser['erro']
+            ]);
+            exit;
+        }
+
+        echo json_encode([
+            'sucesso' => true,
+            'dados1' => $clinperfil['dados']
+        ]);
         exit;
 }

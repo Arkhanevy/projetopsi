@@ -49,7 +49,7 @@ create table cliente ( -- tabela do cliente
     cli_nome varchar(90),-- nome do cliente
     cli_email varchar(90) unique,-- email do cliente
     cli_user varchar(20) unique not null,-- usuario do cliente
-    cli_senha varchar(255),-- senha do cliente
+    cli_senha varchar(255) not null,-- senha do cliente
     cli_bio text,-- biografia do cliente
     cli_foto varchar(100),-- foto do cliente
     cli_codVali varchar(6),-- codigo de validação do cliente
@@ -57,7 +57,7 @@ create table cliente ( -- tabela do cliente
     cli_dtCad datetime default current_timestamp,-- data de cadastro do cliente
     cli_dtDell datetime null,-- data de delete
     cli_stat varchar(8),-- status do cliente
-    cli_CPF varchar(11) unique,-- cpf do cliente
+    cli_CPF varchar(11) unique not null,-- cpf do cliente
     cli_tel varchar(11),-- telefone do cliente
     cli_gen varchar(6),-- genero do cliente
     cli_doc varchar(100),-- documento do cliente
@@ -67,6 +67,7 @@ create table cliente ( -- tabela do cliente
 create table servico (
 	ser_id int auto_increment primary key, -- id do serviço
     ser_pro int not null,-- id do profissional na tabela serviço
+    ser_clinpro int null,
     ser_nome varchar(100) not null,-- nome do serviço
     ser_tipo varchar(50),-- tipo do serviço --
     ser_desc text,-- descrição do serviço
@@ -127,7 +128,8 @@ create table relatorio (-- como queremos guardar os relatorios e que as clinicas
 
 create table hr_servico ( -- para cada dia em que a podologa trabralhar vai ter um horario de inicio e terminio e vai servir tbm pra verificar se o horario corresponde ao horario livre
     hrser_id int auto_increment primary key,-- id dessa tabela
-    hrser_pro int not null,-- id do profissional nessa tabela
+    hrser_pro int null,-- id do profissional nessa tabela
+    hrser_clin int null,
     hrser_hora_inic time not null, -- horario do inicio do trabalho 
     hrser_hora_term time not null, -- horario do termino do trabalho 
     hrser_dia int, -- dias de trabalho 0 = domingo 1 = segunda ...
@@ -149,7 +151,7 @@ create table agenda (-- aqui vai estar os horarios das consultas
     agnd_id int primary key auto_increment, -- id dessa tabela
     agnd_pro int not null,-- id do profissional nessa tabela
     agnd_cli int not null,-- id do cliente nessa tabela
-    agnd_clin int,-- id do cliente nessa tabela
+    agnd_clin int null,-- id da clinica
     agnd_ser int not null,-- id do servico nessa tabela
     /*agnd_sala int not null,-- id da sala nessa tabela*/
     agnd_dt date, -- data da consulta
@@ -157,7 +159,7 @@ create table agenda (-- aqui vai estar os horarios das consultas
     agnd_hrTerm time, -- data de termino da consulta
     constraint fk_agnd_pro foreign key (agnd_pro) references profissional(pro_id),
 	constraint fk_agnd_cli foreign key (agnd_cli) references cliente(cli_id),
-	constraint fk_agnd_clin foreign key (agnd_cli) references clinica(clin_id),
+	constraint fk_agnd_clin foreign key (agnd_clin) references clinica(clin_id),
     constraint fk_agnd_ser foreign key (agnd_ser) references servico(ser_id)
     /*constraint fk_agnd_sal foreign key (agnd_sala) references sala(sala_id)*/ 
 );
@@ -176,8 +178,8 @@ create table atendimento ( -- esse vai salvar pra fazer o relatorio e mander no 
 );
 
 select * from profissional;
-update profissional set pro_email = 'esgts@fvs.ye', pro_codVali = 'pao' where cli_id = '1';
-ALTER TABLE cliente MODIFY COLUMN cli_codVali varchar(6);
-INSERT INTO servico (ser_id, ser_pro, ser_nome, ser_tipo, ser_desc, ser_dur, ser_inter, ser_val, ser_stat, ser_dia) VALUES (0, 1, 'mao de pão', 'mãos', 'sua mão vira pão', 30, 10, 50.20, 'ativado', 0);
+
+/*INSERT INTO servico (ser_id, ser_pro, ser_nome, ser_tipo, ser_desc, ser_dur, ser_inter, ser_val, ser_stat, ser_dia) VALUES (0, 1, 'mao de pão', 'mãos', 'sua mão vira pão', 30, 10, 50.20, 'ativado', 0);
 INSERT INTO hr_servico (hrser_id, hrser_pro, hrser_hora_inic, hrser_hora_term, hrser_dia) VALUES (0, 1, '08:00:00','18:00:00','1');
 INSERT INTO hr_excecao (hr_excecao_id, hr_excecao_pro, hr_excecao_dia, hr_excecao_trab, hr_excecao_ini, hr_excecao_term, hr_excecao_desc) VALUES (0, 1, '2026/08/10',false,null,null,'pão');
+*/
