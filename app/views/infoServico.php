@@ -11,66 +11,77 @@
   <link rel="stylesheet" href="public/assets/css/componentes.css" /><!-- Componentes compartilhados -->
   <link rel="stylesheet" href="public/assets/css/infoServico.css" /><!-- CSS próprio -->
 </head>
-<body class="bodyPagina">
+<body>
+  <a href="#conteudoDetalheServico" class="linkPularConteudo">Pular para o conteúdo principal</a>
 
-
-  <!--NAVEGAÇÃO (DESKTOP)  -->
-  <nav id="navegacaoLateral" class="navegacaoLateral d-none d-md-flex flex-column align-items-center" aria-label="Navegação principal">
-    <a href="/" class="marcaApp" aria-label="Página inicial">
-      <img src="../assets/img/logoElmo.svg" alt="Elmo" class="logoApp" />
-    </a>
-
-    <ul class="listaNavegacao list-unstyled d-flex flex-column align-items-center gap-3">
-      <li>
-        <a href="/agendamento" class="itemNavegacao itemNavegacaoAtivo" aria-current="page" aria-label="Agendamento">
-          <span class="material-symbols-outlined" aria-hidden="true">search</span>
-        </a>
-      </li>
-      <li>
-        <a href="/mensagens" class="itemNavegacao" aria-label="Mensagens">
-          <span class="material-symbols-outlined" aria-hidden="true">chat</span>
-        </a>
-      </li>
-      <li>
-        <a href="/notificacoes" class="itemNavegacao" aria-label="Notificações">
-          <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
-        </a>
-      </li>
-      <li>
-        <a href="/minhas-consultas" class="itemNavegacao" aria-label="Minhas consultas">
-          <span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>
-        </a>
-      </li>
-      <li>
-        <a href="/suporte" class="itemNavegacao" aria-label="Suporte">
-          <span class="material-symbols-outlined" aria-hidden="true">support_agent</span>
-        </a>
-      </li>
-      <li>
-        <a href="/perfil" class="itemNavegacao" aria-label="Perfil">
-          <span class="material-symbols-outlined" aria-hidden="true">person</span>
-        </a>
-      </li>
-    </ul>
+  <!-- NAVEGAÇÃO (DESLOGADO) — exibida por sessaoNavegacao.js quando não há sessão -->
+  <nav class="navTopoDeslogado" aria-label="Navegação principal" hidden>
+    <div class="navTopoDeslogado_barra navTopoDeslogado_acoes">
+      <a href="index.php" class="navTopoDeslogado_logo">
+        <img src="public/assets/images/logo.png" alt="Podopsi" width="50" height="50">
+        <span data-nomePlataforma="">Podopsi</span>
+      </a>
+      <div class="navTopoDeslogado_acoes">
+        <button type="button" class="nav-link dropdown-toggle navbar-brand navTopoDeslogado_acao" data-bs-toggle="dropdown">Cadastre-se</button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="index.php?uri=cadastroCliente">Sou um cliente</a></li>
+          <li><a class="dropdown-item" href="index.php?uri=cadastroProfissional">Sou um profissional</a></li>
+          <li><a class="dropdown-item" href="index.php?uri=cadastroClinica">Sou uma clínica</a></li>
+        </ul>
+        <button type="button" class="nav-link dropdown-toggle navbar-brand navTopoDeslogado_acao" data-bs-toggle="dropdown">Entrar</button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="index.php?uri=loginCliente">Sou um cliente</a></li>
+          <li><a class="dropdown-item" href="index.php?uri=loginProfissional">Sou um profissional</a></li>
+          <li><a class="dropdown-item" href="index.php?uri=loginClinica">Sou uma clínica</a></li>
+        </ul>
+      </div>
+    </div>
   </nav>
 
-  <div class="areaConteudo">
+  <!-- MENU HAMBÚRGUER (DESKTOP, LOGADO) — exibido por sessaoNavegacao.js -->
+  <div class="dropdown menuHamburguerLogado d-none d-md-block" hidden>
+    <button type="button" class="menuHamburguerLogado_botao dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Abrir menu">
+      <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+    </button>
+    <ul class="dropdown-menu menuHamburguerLogado_lista">
+      <li><a href="#" class="dropdown-item menuHamburguerLogado_item"><span class="material-symbols-outlined" aria-hidden="true">help</span>Como funciona</a></li>
+      <li><a href="index.php?uri=centralAjuda" class="dropdown-item menuHamburguerLogado_item"><span class="material-symbols-outlined" aria-hidden="true">support_agent</span>Central de ajuda</a></li>
+      <li><a href="#" class="dropdown-item menuHamburguerLogado_item" data-acao="sair"><span class="material-symbols-outlined" aria-hidden="true">logout</span>Sair</a></li>
+    </ul>
+  </div>
 
-    <!-- CABEÇALHO (MOBILE) -->
-    <header id="cabecalhoMobile" class="cabecalhoMobile d-flex d-md-none align-items-center justify-content-between">
-      <a href="/" class="marcaAppMobile d-flex align-items-center gap-2" aria-label="Página inicial">
-        <img src="../assets/img/logoElmo.svg" alt="" class="logoAppMobile" />
-        <span class="nomeApp">Elmo</span>
+  <!-- NAVEGAÇÃO LATERAL (DESKTOP, LOGADO) — exibida por sessaoNavegacao.js -->
+  <nav class="navLateralLogado d-none d-md-flex" data-papel="cliente" aria-label="Navegação principal" hidden>
+    <a href="index.php?uri=agendamentoCli" class="navLateralLogado_item navLateralLogado_item--ativo" aria-current="page" data-itemPapel>
+      <span class="material-symbols-outlined" aria-hidden="true">search</span>
+      <span class="navLateralLogado_rotulo">Buscar</span>
+    </a>
+    <a href="index.php?uri=mensagens" class="navLateralLogado_item" data-itemContatos>
+      <span class="material-symbols-outlined" aria-hidden="true">chat</span>
+      <span class="navLateralLogado_rotulo">Contatos</span>
+    </a>
+    <a href="index.php?uri=notificacoes" class="navLateralLogado_item">
+      <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+      <span class="navLateralLogado_rotulo">Notificação</span>
+    </a>
+    <a href="index.php?uri=consultasCli" class="navLateralLogado_item">
+      <span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>
+      <span class="navLateralLogado_rotulo">Agenda</span>
+    </a>
+    <div class="navLateralLogado_rodape">
+      <a href="index.php?uri=perfil" class="navLateralLogado_item">
+        <span class="material-symbols-outlined" aria-hidden="true">person</span>
+        <span class="navLateralLogado_rotulo">Perfil</span>
       </a>
-      <button type="button" id="botaoMenuMobile" class="botaoMenuMobile btn" aria-label="Abrir menu" aria-expanded="false">
-        <span class="material-symbols-outlined" aria-hidden="true">menu</span>
-      </button>
-    </header>
+    </div>
+  </nav>
+
+  <div>
 
     <!-- CONTEÚDO PRINCIPAL -->
-    <main id="conteudoDetalheServico" class="conteudoPagina conteudoDetalheServico container-fluid">
+    <main id="conteudoDetalheServico" class="conteudoDetalheServico container-fluid">
 
-      <button type="button" id="botaoVoltar" class="botaoVoltar btn rounded-circle" aria-label="Voltar">
+      <button type="button" id="botaoVoltar" class="botaoVoltarServico btn rounded-circle" aria-label="Voltar" onclick="window.history.back();">
         <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
       </button>
 
@@ -79,7 +90,7 @@
         <div class="col-12 col-md-6">
           <figure class="figuraServico">
             <img
-              src="assets/img/servico.jpg"
+              src="public/assets/images/servico.jpg"
               alt="Profissional realizando procedimento de remoção de unha encravada no pé do paciente"
               class="imagemServico img-fluid rounded"
               data-campo="imagemServico"
@@ -117,7 +128,11 @@
               </p>
             </section>
 
-            <button type="button" id="botaoAgendarAgora" class="botaoAgendarAgora botaoPrimario btn rounded-pill order-5">
+            <button
+              type="button"
+              id="botaoAgendarAgora"
+              class="botaoAgendarAgora btn botaoBase botaoBase--primario order-5"
+            >
               Agendar agora
             </button>
 
@@ -127,82 +142,106 @@
       </article>
     </main>
 
-    <!-- NAVEGAÇÃO INFERIOR -->
-    <nav id="navegacaoInferior" class="navegacaoInferior d-flex d-md-none align-items-center justify-content-around" aria-label="Navegação principal">
-      <a href="/notificacoes" class="itemNavegacaoInferior" aria-label="Notificações">
+    <!-- NAVEGAÇÃO INFERIOR (MOBILE, LOGADO) — exibida por sessaoNavegacao.js -->
+    <nav class="navInferiorLogado d-flex d-md-none" data-papel="cliente" aria-label="Navegação principal" hidden>
+      <a href="index.php?uri=notificacoes" class="navInferiorLogado_item">
         <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+        <span class="navInferiorLogado_rotulo">Notif.</span>
       </a>
-      <a href="/mensagens" class="itemNavegacaoInferior" aria-label="Mensagens">
+      <a href="index.php?uri=mensagens" class="navInferiorLogado_item" data-itemContatos>
         <span class="material-symbols-outlined" aria-hidden="true">chat</span>
+        <span class="navInferiorLogado_rotulo">Contatos</span>
       </a>
-      <a href="/agendamento" class="itemNavegacaoInferior itemNavegacaoInferiorAtivo" aria-current="page" aria-label="Agendamento">
+      <a href="index.php?uri=agendamentoCli" class="navInferiorLogado_item navInferiorLogado_item--ativo" aria-current="page" data-itemPapel>
         <span class="material-symbols-outlined" aria-hidden="true">search</span>
+        <span class="navInferiorLogado_rotulo">Buscar</span>
       </a>
-      <a href="/minhas-consultas" class="itemNavegacaoInferior" aria-label="Minhas consultas">
+      <a href="index.php?uri=consultasCli" class="navInferiorLogado_item">
         <span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>
+        <span class="navInferiorLogado_rotulo">Agenda</span>
       </a>
-      <a href="/perfil" class="itemNavegacaoInferior" aria-label="Perfil">
+      <a href="index.php?uri=perfil" class="navInferiorLogado_item">
         <span class="material-symbols-outlined" aria-hidden="true">person</span>
+        <span class="navInferiorLogado_rotulo">Perfil</span>
       </a>
     </nav>
 
   </div>
 
-  <!-- MODAL: SERVIÇO NÃO ENCONTRADO  -->
-  <div class="modal fade modalPadrao modalErro" id="modalServicoNaoEncontrado" tabindex="-1" aria-labelledby="tituloModalServicoNaoEncontrado" aria-describedby="textoModalServicoNaoEncontrado" aria-modal="true" role="dialog" >
+  <!-- MODAL: SERVIÇO NÃO ENCONTRADO -->
+  <div
+    class="modal fade modalBase"
+    id="modalServicoNaoEncontrado"
+    tabindex="-1"
+    aria-labelledby="tituloModalServicoNaoEncontrado"
+    aria-describedby="textoModalServicoNaoEncontrado"
+    aria-modal="true"
+    role="dialog"
+  >
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
+      <div class="modal-content modalBase_conteudo">
+        <div class="modal-header modalBase_cabecalho">
+          <h2 class="modal-title modalBase_titulo" id="tituloModalServicoNaoEncontrado">Serviço não encontrado</h2>
+        </div>
         <div class="modal-body text-center">
           <p class="visually-hidden">
             Esta janela não pode ser fechada automaticamente. Use o botão
             "Tentar novamente" ou o link "Central de Ajuda" abaixo para continuar.
           </p>
 
-          <h2 id="tituloModalServicoNaoEncontrado" class="tituloModal">Serviço não encontrado</h2>
-
-          <div class="iconeModal" aria-hidden="true">
-            <span class="material-symbols-outlined iconeModalBase">search</span>
-            <span class="material-symbols-outlined iconeModalSobreposto">monitor_heart</span>
+          <div class="iconeModalErro" aria-hidden="true">
+            <span class="material-symbols-outlined iconeModalErroBase" aria-hidden="true">search</span>
+            <span class="material-symbols-outlined iconeModalErroSobreposto" aria-hidden="true">monitor_heart</span>
           </div>
 
-          <p id="textoModalServicoNaoEncontrado" class="textoModal">
+          <p id="textoModalServicoNaoEncontrado">
             Infelizmente não conseguimos encontrar o serviço que você selecionou.
           </p>
-
-          <button type="button" id="botaoTentarNovamente" class="botaoTentarNovamente botaoPrimario btn rounded-pill">
+        </div>
+        <div class="modal-footer modalBase_rodape">
+          <button type="button" id="botaoTentarNovamente" class="btn botaoBase botaoBase--primario">
             Tentar novamente
           </button>
-
-          <p class="textoRodapeModal">
-            Caso o erro permaneça, entre em contato com a
-            <a href="/central-de-ajuda" id="linkCentralAjuda" class="linkTexto">Central de Ajuda.</a>
-          </p>
         </div>
+        <p class="textoSmall text-center pb-3">
+          Caso o erro permaneça, entre em contato com a
+          <a href="index.php?uri=centralAjuda" id="linkCentralAjuda">Central de Ajuda.</a>
+        </p>
       </div>
     </div>
   </div>
 
-  <!--  MODAL: PEDIDO DE AGENDAMENTO ENVIADO  -->
-  <div class="modal fade modalPadrao modalSucesso" id="modalAgendamentoEnviado" tabindex="-1" aria-labelledby="tituloModalAgendamentoEnviado" aria-describedby="textoModalAgendamentoEnviado"  aria-modal="true"  role="dialog">
+  <!-- MODAL: PEDIDO DE AGENDAMENTO ENVIADO -->
+  <div
+    class="modal fade modalBase"
+    id="modalAgendamentoEnviado"
+    tabindex="-1"
+    aria-labelledby="tituloModalAgendamentoEnviado"
+    aria-describedby="textoModalAgendamentoEnviado"
+    aria-modal="true"
+    role="dialog"
+  >
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <button type="button" class="botaoFecharModal btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-
-        <div class="modal-body text-center">
-          <h2 id="tituloModalAgendamentoEnviado" class="tituloModal">
+      <div class="modal-content modalBase_conteudo">
+        <div class="modal-header modalBase_cabecalho">
+          <h2 class="modal-title modalBase_titulo" id="tituloModalAgendamentoEnviado">
             Pedido de agendamento enviado!
           </h2>
-
-          <p id="textoModalAgendamentoEnviado" class="textoModal">
+          <button type="button" class="modalBase_botaoFechar" data-bs-dismiss="modal" aria-label="Fechar">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <p id="textoModalAgendamentoEnviado">
             Seu pedido de agendamento foi enviado para
             <span data-campo="nomeProfissional">Samanta Santos</span>. No momento, sua consulta
             está aguardando a confirmação do profissional.
           </p>
 
-          <p class="textoModal">
+          <p>
             Quando a consulta for confirmada, você receberá uma mensagem. Para acompanhar o
             status ou reagendar sua consulta, acesse as
-            <a href="/projetopsi/index.php?uri=consultasCli" id="linkMinhasConsultas" class="linkTexto">Minhas Consultas</a>.
+            <a href="index.php?uri=consultasCli" id="linkMinhasConsultas">Minhas Consultas</a>.
           </p>
         </div>
       </div>
@@ -214,6 +253,8 @@
 
   <!-- Bootstrap 5 -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="public/assets/js/componentes.js"></script><!-- Componentes compartilhados -->
+  <script src="public/assets/js/sessaoNavegacao.js"></script><!-- Decide qual navegação exibir -->
   <script src="public/assets/js/utilitarios.js"></script>
   <script src="public/assets/js/infoServico.js" defer></script>
 </body>

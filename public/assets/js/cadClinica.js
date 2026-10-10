@@ -1,5 +1,5 @@
 console.log("JS cadClinica carregado");
-/* ============================================================
+/*aaaaaa ============================================================
    PÁGINA: cadClinica (Cadastro / Ativação da Clínica)
    Depende de: jQuery, Bootstrap 5 (bundle JS), ElmoUtilitarios
    (ver /assets/js/utilitarios.js — deve ser carregado antes deste arquivo)
@@ -81,6 +81,8 @@ console.log("JS cadClinica carregado");
       this.elementos.$ibge = $("#ibgeClinica");
       this.elementos.$cidade = $("#cidadeClinica");
       this.elementos.$form = $("#cadastroClinica");
+
+
       this.elementos.$emailAtivacao = $("#emailAtivar");
       this.elementos.$codigo = $("#codigoCliente");
 
@@ -89,8 +91,26 @@ console.log("JS cadClinica carregado");
       this.elementos.$botaoAtivar = $("#btnAtivar");
     },
 
+    /* VALIDAÇÃO AO SAIR DO CAMPO */
+
+    validarCamposAoSair: function () {
+      Utilitarios.validarAoSair(this.elementos.$alertContainer, [
+        { $campo: this.elementos.$cnpj, valido: function (valor) { return Utilitarios.cnpjValido(valor); }, mensagem: "CNPJ inválido!" },
+        { $campo: this.elementos.$tel, valido: function (valor) { return Utilitarios.telefoneValido(valor); }, mensagem: "Telefone inválido!" },
+        { $campo: this.elementos.$email, valido: function (valor) { return Utilitarios.emailValido(valor); }, mensagem: "E-mail inválido!" }
+      ]);
+    },
+
     registrarEventos: function () {
+      this.validarCamposAoSair();
+
+      // Nenhum formulário desta página é enviado de forma nativa: o envio
+      // é sempre feito por AJAX (evita recarregar a tela e perder a requisição).
+      $(document).on("submit", "form", function (evento) {
+        evento.preventDefault();
+      });
       var self = this;
+
       // Remove o estado de erro assim que o usuário volta a interagir com o campo.
       $(document).on("input change", ".form-control, .form-select, textarea", function () {
         $(this).removeClass("is-invalid");
@@ -214,25 +234,33 @@ console.log("JS cadClinica carregado");
       formData.append("acao", "cadastrar");
 
       $.ajax({
-        url: this.configuracao.urlClinica,
-        method: "POST",
-        data: formData,
-        processData: false,
-        contentType: false
+          url: this.configuracao.urlClinica,
+          method: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json"
       })
-        .done(function (resposta) {
+      .done(function (resposta) {
           $botao.prop("disabled", false).html("Cadastrar");
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Cadastro realizado!", "success");
-            self.mostrarTela("ativacao");
+          if (resposta.sucesso === true) {
+              self.mostrarAlert("Cadastro realizado!", "success");
+              self.mostrarTela("ativacao");
           } else {
-            self.mostrarAlert(resposta, "danger");
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível realizar o cadastro.",
+                  "danger"
+              );
           }
-        })
-        .fail(function () {
+      })
+      .fail(function (xhr, status, erro) {
           $botao.prop("disabled", false).html("Cadastrar");
+
+          console.error("Erro no cadastro:", status, erro);
+          console.error("Resposta do servidor:", xhr.responseText);
+
           self.mostrarAlert("Erro na requisição!", "danger");
-        });
+      });
     },
 
     /* CÓDIGO DE ATIVAÇÃO */
@@ -247,7 +275,7 @@ console.log("JS cadClinica carregado");
 
       var intervalo = setInterval(function () {
         tempo--;
-        $botao.text("Aguarde " + tempo + "s para gerar um novo código");
+        $botao.text("Aguarde " + tempo + "s para gerar \b um novo código");
         if (tempo <= 0) {
           clearInterval(intervalo);
           $botao.prop("disabled", false);
@@ -266,19 +294,28 @@ console.log("JS cadClinica carregado");
         method: "POST",
         data: fd,
         processData: false,
-        contentType: false
+        contentType: false,
+        dataType: "json"
       })
-        .done(function (resposta) {
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Código enviado com sucesso para o seu e-mail!", "success");
-            self.estado.codigoGerado = true;
+      .done(function (resposta) {
+          if (resposta.sucesso === true) {
+              self.mostrarAlert(
+                  "Código enviado com sucesso para o seu e-mail!",
+                  "success"
+              );
+
+              self.estado.codigoGerado = true;
           } else {
-            self.mostrarAlert(resposta, "danger");
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível gerar o código.",
+                  "danger"
+              );
           }
-        })
-        .fail(function () {
-          console.error("Erro na requisição ao gerar código!");
-        });
+      })
+      .fail(function (xhr, status, erro) {
+          console.error("Erro ao gerar código:", status, erro, xhr.responseText);
+          self.mostrarAlert("Erro na requisição ao gerar código!", "danger");
+      });
     },
 
     ativarConta: function ($botao) {
@@ -301,9 +338,10 @@ console.log("JS cadClinica carregado");
       }
 
       $botao.prop("disabled", true).html("Ativando...");
+
       var fd = new FormData();
       fd.append("email", email);
-      fd.append("codigo", codigoDigitado);
+      fd.append("cod", codigoDigitado);
       fd.append("acao", "ativar");
 
       $.ajax({
@@ -311,26 +349,35 @@ console.log("JS cadClinica carregado");
         method: "POST",
         data: fd,
         processData: false,
-        contentType: false
+        contentType: false,
+        dataType: "json"
       })
-        .done(function (resposta) {
+      .done(function (resposta) {
+            console.log("Resposta do cadastro:", resposta);
+            console.log("Tipo de sucesso:", typeof resposta.sucesso);
           $botao.prop("disabled", false).html("Ativar");
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Conta ativada com sucesso!", "success");
-            self.estado.codigoGerado = false;
-            setTimeout(function () {
-              window.location.href = self.configuracao.urlLogin;
-            }, 1500);
+
+          if (resposta.sucesso === true) {
+              self.mostrarAlert("Conta ativada com sucesso!", "success");
+              self.estado.codigoGerado = false;
+
+              setTimeout(function () {
+                  window.location.href = self.configuracao.urlLogin;
+              }, 1500);
           } else {
-            $campoCodigo.addClass("is-invalid");
-            self.mostrarAlert(resposta, "danger");
+              $campoCodigo.addClass("is-invalid");
+
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível ativar a conta.",
+                  "danger"
+              );
           }
-        })
-        .fail(function (xhr, status, erro) {
+      })
+      .fail(function (xhr, status, erro) {
           $botao.prop("disabled", false).html("Ativar");
           console.error("Erro na ativação:", status, erro, xhr.responseText);
           self.mostrarAlert("Erro na requisição de ativação!", "danger");
-        });
+      });
     }
   };
 

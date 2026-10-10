@@ -1,0 +1,10 @@
+/* loginClinica.css — estilos específicos do login de clínica.
+   Depende de: variaveis.css, componentes.css e autenticacaoBase.css. */
+
+/* TABLET+ (≥ 768px) */
+@media (min-width: 768px) {
+  #loginClinica {
+    width: 100%;
+    max-width: 420px;
+  }
+}

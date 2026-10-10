@@ -34,14 +34,14 @@ switch ($acao){
         exit;
         
     case "ativar":
-        $camposclin = [$campos[2], $campos[7],$campos[11]];
+        $camposclin = [$campos[2], $campos[7],$campos[10]];
         $clinica = new clinica('clinica', $camposclin, $camposclin[0]);
         $resultado = $clinica->Ativar($_POST['email'], $_POST['cod']);
         echo json_encode($resultado);
         exit;
         
     case "login":
-        $camposclin = [$campos[0],$campos[1],$campos[2],$campos[4], $campos[11]];
+        $camposclin = [$campos[0],$campos[1],$campos[2],$campos[4], $campos[10]];
         $clinica = new clinica('clinica', $camposclin, $camposclin[2]);
         $resultado = $clinica->Login($_POST['email'],$_POST['senha']);
         echo json_encode($resultado);

@@ -1,12 +1,10 @@
 console.log("JS cadProfissional carregado");
-/* ============================================================
-<<<<<<< HEAD
+/* a============================================================
    PÁGINA: cadProfissional (Cadastro / Ativação do Profissional)
    Depende de: jQuery, Bootstrap 5 (bundle JS), ElmoUtilitarios
    (ver /assets/js/utilitarios.js — deve ser carregado antes deste arquivo)
 
    Responsabilidades deste arquivo:
-<<<<<<< HEAD
    - Alternar entre as telas de cadastro e ativação
      do profissional.
    - Preencher automaticamente o endereço a partir do CEP (ViaCEP).
@@ -85,7 +83,9 @@ console.log("JS cadProfissional carregado");
       this.elementos.$ibge = $("#ibge");
       this.elementos.$cidade = $("#cidade");
       this.elementos.$registro = $("#registroProfissional");
+      this.elementos.$locais = $("input[name='cxproLocalAtendimento']");
       this.elementos.$form = $("#cadastroProfissional");
+
 
       this.elementos.$emailAtivacao = $("#emailAtivar");
       this.elementos.$codigo = $("#codigoCliente");
@@ -95,25 +95,40 @@ console.log("JS cadProfissional carregado");
       this.elementos.$botaoAtivar = $("#btnAtivar");
     },
 
+    /* VALIDAÇÃO AO SAIR DO CAMPO */
+
+    validarCamposAoSair: function () {
+      Utilitarios.validarAoSair(this.elementos.$alertContainer, [
+        { $campo: this.elementos.$cpf, valido: function (valor) { return Utilitarios.cpfValido(Utilitarios.apenasNumeros(valor)); }, mensagem: "CPF inválido!" },
+        { $campo: this.elementos.$tel, valido: function (valor) { return Utilitarios.telefoneValido(valor); }, mensagem: "Telefone inválido!" },
+        { $campo: this.elementos.$data, valido: function (valor) { return Utilitarios.maiorDeIdade(valor, 18); }, mensagem: "Você precisa ser maior de 18 anos para se cadastrar!" },
+        { $campo: this.elementos.$email, valido: function (valor) { return Utilitarios.emailValido(valor); }, mensagem: "E-mail inválido!" }
+      ]);
+    },
+
     registrarEventos: function () {
+      this.validarCamposAoSair();
+
+      // Nenhum formulário desta página é enviado de forma nativa: o envio
+      // é sempre feito por AJAX (evita recarregar a tela e perder a requisição).
+      $(document).on("submit", "form", function (evento) {
+        evento.preventDefault();
+      });
       var self = this;
 
-      // Troca de telas
-      $(".logarProfissional").on("click", function (evento) {
-        evento.preventDefault();
-        self.mostrarTela("loginProfissional");
-      });
-
-      $(".cadastrarProfissional").on("click", function (evento) {
-        evento.preventDefault();
-        self.mostrarTela("cadastroProfissional");
-      });
       // Remove o estado de erro assim que o usuário volta a interagir com o campo.
       $(document).on("input change", ".form-control, .form-select, textarea", function () {
         $(this).removeClass("is-invalid");
       });
 
-      this.elementos.$botaoCadastrar.on("click", function () {
+      this.elementos.$locais.on("change", function () {
+        self.elementos.$locais.removeClass("is-invalid");
+      });
+
+      this.elementos.$botaoCadastrar.on("click", function (evento) {
+        // Impede o envio nativo do formulário (que recarregaria a página
+        // e cancelaria a requisição); o envio é feito por AJAX.
+        evento.preventDefault();
         self.enviarCadastro($(this));
       });
 
@@ -182,6 +197,16 @@ console.log("JS cadProfissional carregado");
         return;
       }
 
+      var locaisSelecionados = el.$locais.filter(":checked").map(function () {
+        return this.value;
+      }).get();
+
+      if (locaisSelecionados.length === 0) {
+        $botao.prop("disabled", false).html("Cadastrar");
+        Utilitarios.marcarCamposComErro(el.$alertContainer, [el.$locais], "Selecione ao menos um local de atendimento!");
+        return;
+      }
+
       var cpf = el.$cpf.val().trim();
       if (!cpf || !Utilitarios.cpfValido(cpf)) {
         el.$cpf.addClass("is-invalid");
@@ -189,6 +214,7 @@ console.log("JS cadProfissional carregado");
         this.mostrarAlert("CPF inválido!", "danger");
         return;
       }
+
       if (!Utilitarios.telefoneValido(el.$tel.val())) {
         el.$tel.addClass("is-invalid");
         $botao.prop("disabled", false).html("Cadastrar");
@@ -232,6 +258,9 @@ console.log("JS cadProfissional carregado");
       formData.append("nome", el.$nome.val());
       formData.append("email", email);
       formData.append("telefone", Utilitarios.apenasNumeros(el.$tel.val()));
+      locaisSelecionados.forEach(function (local) {
+        formData.append("locaisAtendimento[]", local);
+      });
       formData.append("username", el.$user.val());
       formData.append("bio", el.$bio.val());
       formData.append("dtNas", el.$data.val());
@@ -244,26 +273,31 @@ console.log("JS cadProfissional carregado");
       formData.append("cxproFoto", imgArquivo);
 
       $.ajax({
-        url: this.configuracao.urlProfissional,
-        method: "POST",
-        data: formData,
-        processData: false,
-        contentType: false
+          url: this.configuracao.urlProfissional,
+          method: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json"
       })
-        .done(function (resposta) {
+      .done(function (resposta) {
           $botao.prop("disabled", false).html("Cadastrar");
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Cadastro realizado!", "success");
-            self.mostrarTela("ativacao");
+          if (resposta.sucesso === true) {
+              self.mostrarAlert("Cadastro realizado!", "success");
+              self.mostrarTela("ativacao");
           } else {
-            self.mostrarAlert(resposta, "danger");
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível realizar o cadastro.",
+                  "danger"
+              );
           }
-        })
-        .fail(function () {
+      })
+      .fail(function () {
           $botao.prop("disabled", false).html("Cadastrar");
           self.mostrarAlert("Erro na requisição!", "danger");
-        });
+      });
     },
+
     /* CÓDIGO DE ATIVAÇÃO */
 
     gerarCodigo: function ($botao) {
@@ -276,7 +310,7 @@ console.log("JS cadProfissional carregado");
 
       var intervalo = setInterval(function () {
         tempo--;
-        $botao.text("Aguarde " + tempo + "s para gerar um novo código");
+        $botao.text("Aguarde " + tempo + "s para gerar \b um novo código");
         if (tempo <= 0) {
           clearInterval(intervalo);
           $botao.prop("disabled", false);
@@ -289,24 +323,34 @@ console.log("JS cadProfissional carregado");
       var fd = new FormData();
       fd.append("email", email);
       fd.append("acao", "ReGerarCodigo");
+
       $.ajax({
         url: this.configuracao.urlProfissional,
         method: "POST",
         data: fd,
         processData: false,
-        contentType: false
+        contentType: false,
+        dataType: "json"
       })
-        .done(function (resposta) {
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Código enviado com sucesso para o seu e-mail!", "success");
-            self.estado.codigoGerado = true;
+      .done(function (resposta) {
+          if (resposta.sucesso === true) {
+              self.mostrarAlert(
+                  "Código enviado com sucesso para o seu e-mail!",
+                  "success"
+              );
+
+              self.estado.codigoGerado = true;
           } else {
-            self.mostrarAlert(resposta, "danger");
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível gerar o código.",
+                  "danger"
+              );
           }
-        })
-        .fail(function () {
-          console.error("Erro na requisição ao gerar código!");
-        });
+      })
+      .fail(function (xhr, status, erro) {
+          console.error("Erro ao gerar código:", status, erro, xhr.responseText);
+          self.mostrarAlert("Erro na requisição ao gerar código!", "danger");
+      });
     },
 
     ativarConta: function ($botao) {
@@ -329,36 +373,46 @@ console.log("JS cadProfissional carregado");
       }
 
       $botao.prop("disabled", true).html("Ativando...");
+
       var fd = new FormData();
       fd.append("email", email);
-      fd.append("codigo", codigoDigitado);
+      fd.append("cod", codigoDigitado);
       fd.append("acao", "ativar");
 
       $.ajax({
-        url: this.configuracao.urlProfissional,
-        method: "POST",
-        data: fd,
-        processData: false,
-        contentType: false
+    url: this.configuracao.urlProfissional,
+    method: "POST",
+    data: fd,
+    processData: false,
+    contentType: false,
+    dataType: "json"
       })
-        .done(function (resposta) {
+      .done(function (resposta) {
           $botao.prop("disabled", false).html("Ativar");
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Conta ativada com sucesso!", "success");
-            self.estado.codigoGerado = false;
-            setTimeout(function () {
-              window.location.href = self.configuracao.urlLogin;
-            }, 1500);
+
+          if (resposta.sucesso === true) {
+              self.mostrarAlert("Conta ativada com sucesso!", "success");
+              self.estado.codigoGerado = false;
+
+              setTimeout(function () {
+                  window.location.href = self.configuracao.urlLogin;
+              }, 1500);
           } else {
-            $campoCodigo.addClass("is-invalid");
-            self.mostrarAlert(resposta, "danger");
+              $campoCodigo.addClass("is-invalid");
+
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível ativar a conta.",
+                  "danger"
+              );
           }
-        })
-        .fail(function (xhr, status, erro) {
+      })
+      .fail(function (xhr, status, erro) {
           $botao.prop("disabled", false).html("Ativar");
+
           console.error("Erro na ativação:", status, erro, xhr.responseText);
+
           self.mostrarAlert("Erro na requisição de ativação!", "danger");
-        });
+      });
     }
   };
 

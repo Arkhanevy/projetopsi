@@ -19,7 +19,7 @@ console.log("JS loginClinica carregado");
     /* ---------- Configuração ---------- */
     configuracao: {
       urlClinica: "/projetopsi/index.php?uri=clinica", //Axolote
-      urlInfoServico: "index.php?uri=infoServico"
+      urlPerfil: "index.php?uri=perfil"
     },
 
     /* ---------- Referências de elementos (cacheadas) ---------- */
@@ -42,7 +42,22 @@ console.log("JS loginClinica carregado");
       this.elementos.$botaoLogar = $("#btnLogClinica");
     },
 
+    /* VALIDAÇÃO AO SAIR DO CAMPO */
+
+    validarCamposAoSair: function () {
+      Utilitarios.validarAoSair(this.elementos.$alertContainer, [
+        { $campo: this.elementos.$loginEmail, valido: function (valor) { return Utilitarios.emailValido(valor); }, mensagem: "E-mail inválido!" }
+      ]);
+    },
+
     registrarEventos: function () {
+      this.validarCamposAoSair();
+
+      // Nenhum formulário desta página é enviado de forma nativa: o envio
+      // é sempre feito por AJAX (evita recarregar a tela e perder a requisição).
+      $(document).on("submit", "form", function (evento) {
+        evento.preventDefault();
+      });
       var self = this;
 
       // Remove o estado de erro assim que o usuário volta a interagir com o campo.
@@ -91,7 +106,7 @@ console.log("JS loginClinica carregado");
 
       var fd = new FormData();
       fd.append("email", email);
-      fd.append("senhaLog", el.$loginSenha.val());
+      fd.append("senha", el.$loginSenha.val());
       fd.append("acao", "login");
 
       $.ajax({
@@ -99,22 +114,25 @@ console.log("JS loginClinica carregado");
         method: "POST",
         data: fd,
         processData: false,
-        contentType: false
+        contentType: false,
+        dataType: "json"
+          })
+      .done(function (resposta) {
+        $botao.prop("disabled", false).html("Logar");
+        if (resposta.sucesso === true) {
+          self.mostrarAlert("Login realizado com sucesso!", "success");
+          window.location.href = self.configuracao.urlPerfil;
+        } else {
+          self.mostrarAlert(
+            resposta.mensagem || "Não foi possível realizar o login.", "danger"
+          );
+        }
       })
-        .done(function (resposta) {
-          $botao.prop("disabled", false).html("Logar");
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Login realizado com sucesso!", "success");
-            window.location.href = self.configuracao.urlInfoServico;
-          } else {
-            self.mostrarAlert(resposta, "danger");
-          }
-        })
-        .fail(function (xhr, status, erro) {
-          $botao.prop("disabled", false).html("Logar");
-          console.error("Erro no login:", status, erro, xhr.responseText);
-          self.mostrarAlert("Erro na requisição!", "danger");
-        });
+      .fail(function (xhr, status, erro) {
+        $botao.prop("disabled", false).html("Logar");
+        console.error("Erro no login:", status, erro, xhr.responseText);
+        self.mostrarAlert("Erro na requisição!", "danger");
+      });
     }
   };
 

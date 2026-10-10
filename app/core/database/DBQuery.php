@@ -190,12 +190,18 @@ class DBQuery {
         // echo $sql;
         try {
             return $this->conn->query($sql);
-        } catch ( PDOException $error) {
-            if ($error->getCode() == 23000) {
-                throw new \Exception('Violação de chave única ou estrangeira.');
+        } catch (PDOException $error) {
+                error_log(
+                    "Erro SQL em {$this->tableName}: " .
+                    $error->getMessage()
+                );
+
+                if ($error->getCode() == 23000) {
+                    throw new Exception('Violação de chave única ou estrangeira.');
+                }
+
+                throw $error;
             }
-            throw $error;
-        }
     }
     
     /**

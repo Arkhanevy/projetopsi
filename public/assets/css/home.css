@@ -1,0 +1,27 @@
+/* home.css — estilos específicos da página inicial. Depende de variaveis.css e componentes.css. */
+
+  .fundo {
+    position: relative;
+    min-height: 100vh;
+    background-image: url(".../images/bannerHorizontal.jpg");
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Filtro esverdeado */
+  .fundo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 120, 60, 0.45);
+  }
+
+  /* Conteúdo fica acima do filtro */
+  .fundo>* {
+    position: relative;
+    z-index: 1;
+  }
+
+  .campoPesquisaHome {
+    max-width: 480px;
+  }

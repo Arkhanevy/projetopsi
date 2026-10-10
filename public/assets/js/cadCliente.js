@@ -1,17 +1,13 @@
 console.log("JS cadCliente carregado");
 /* ============================================================
-
    PÁGINA: cadCliente (Cadastro / Ativação do Cliente)
-
    Depende de: jQuery, Bootstrap 5 (bundle JS), ElmoUtilitarios
    (ver /assets/js/utilitarios.js — deve ser carregado antes deste arquivo)
 
    Responsabilidades deste arquivo:
-
    - Alternar entre as telas de cadastro e ativação do cliente.
    - Redirecionar para a página de login (loginCliente) após a ativação
      e para links antigos com ?tipo=login.
-
    - Validar e enviar o formulário de cadastro via AJAX (com upload
      da imagem de perfil).
    - Gerar/reenviar o código de ativação por e-mail.
@@ -27,7 +23,6 @@ console.log("JS cadCliente carregado");
     configuracao: {
       urlCliente: "/projetopsi/index.php?uri=cliente", //Axolote
       urlLogin: "index.php?uri=loginCliente"
-
     },
 
     /* ---------- Estado interno ---------- */
@@ -63,7 +58,6 @@ console.log("JS cadCliente carregado");
       this.telas = {
         cadastro: $("#cadastroCliente"),
         ativacao: $("#ativacao")
-
       };
 
       this.elementos.$alertContainer = $("#alertContainer");
@@ -81,8 +75,6 @@ console.log("JS cadCliente carregado");
       this.elementos.$senha = $("#senhaCliente");
       this.elementos.$form = $("#cadastroCliente");
 
-      this.elementos.$loginEmail = $("#emailLogin");
-      this.elementos.$loginSenha = $("#senhaLogin");
 
       this.elementos.$emailAtivacao = $("#emailAtivacao");
       this.elementos.$codigo = $("#codigoCliente");
@@ -90,10 +82,27 @@ console.log("JS cadCliente carregado");
       this.elementos.$botaoCadastrar = $("#btnCadastrar");
       this.elementos.$botaoCodigo = $("#btnCodigo");
       this.elementos.$botaoAtivar = $("#btnAtivar");
+    },
 
+    /* VALIDAÇÃO AO SAIR DO CAMPO */
+
+    validarCamposAoSair: function () {
+      Utilitarios.validarAoSair(this.elementos.$alertContainer, [
+        { $campo: this.elementos.$cpf, valido: function (valor) { return Utilitarios.cpfValido(Utilitarios.apenasNumeros(valor)); }, mensagem: "CPF inválido!" },
+        { $campo: this.elementos.$tel, valido: function (valor) { return Utilitarios.telefoneValido(valor); }, mensagem: "Telefone inválido!" },
+        { $campo: this.elementos.$data, valido: function (valor) { return Utilitarios.maiorDeIdade(valor, 18); }, mensagem: "Você precisa ser maior de 18 anos para se cadastrar!" },
+        { $campo: this.elementos.$email, valido: function (valor) { return Utilitarios.emailValido(valor); }, mensagem: "E-mail inválido!" }
+      ]);
     },
 
     registrarEventos: function () {
+      this.validarCamposAoSair();
+
+      // Nenhum formulário desta página é enviado de forma nativa: o envio
+      // é sempre feito por AJAX (evita recarregar a tela e perder a requisição).
+      $(document).on("submit", "form", function (evento) {
+        evento.preventDefault();
+      });
       var self = this;
 
       // Remove o estado de erro assim que o usuário volta a interagir com o campo.
@@ -101,7 +110,10 @@ console.log("JS cadCliente carregado");
         $(this).removeClass("is-invalid");
       });
 
-      this.elementos.$botaoCadastrar.on("click", function () {
+      this.elementos.$botaoCadastrar.on("click", function (evento) {
+        // Impede o envio nativo do formulário (que recarregaria a página
+        // e cancelaria a requisição); o envio é feito por AJAX.
+        evento.preventDefault();
         self.enviarCadastro($(this));
       });
 
@@ -114,7 +126,6 @@ console.log("JS cadCliente carregado");
         evento.preventDefault();
         self.ativarConta($(this));
       });
-
 
     },
 
@@ -217,25 +228,33 @@ console.log("JS cadCliente carregado");
       formData.append("cxclientefoto", imgArquivo);
 
       $.ajax({
-        url: this.configuracao.urlCliente,
-        method: "POST",
-        data: formData,
-        processData: false,
-        contentType: false
+          url: this.configuracao.urlCliente,
+          method: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json"
       })
-        .done(function (resposta) {
+      .done(function (resposta) {
           $botao.prop("disabled", false).html("Cadastrar");
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Cadastro realizado com sucesso!", "success");
-            self.mostrarTela("ativacao");
+          if (resposta.sucesso === true) {
+              self.mostrarAlert("Cadastro realizado!", "success");
+              self.mostrarTela("ativacao");
           } else {
-            self.mostrarAlert(resposta, "danger");
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível realizar o cadastro.",
+                  "danger"
+              );
           }
-        })
-        .fail(function () {
+      })
+      .fail(function (xhr, status, erro) {
           $botao.prop("disabled", false).html("Cadastrar");
-          self.mostrarAlert("Erro interno na requisição. Tente novamente.", "danger");
-        });
+
+          console.error("Erro no cadastro:", status, erro);
+          console.error("Resposta do servidor:", xhr.responseText);
+
+          self.mostrarAlert("Erro na requisição!", "danger");
+      });
     },
 
     /* CÓDIGO DE ATIVAÇÃO */
@@ -250,7 +269,7 @@ console.log("JS cadCliente carregado");
 
       var intervalo = setInterval(function () {
         tempo--;
-        $botao.text("Aguarde " + tempo + "s até conseguir gerar um novo código.");
+        $botao.text("Aguarde " + tempo + "s até conseguir gerar \b um novo código.");
         if (tempo <= 0) {
           clearInterval(intervalo);
           $botao.prop("disabled", false);
@@ -269,19 +288,28 @@ console.log("JS cadCliente carregado");
         method: "POST",
         data: fd,
         processData: false,
-        contentType: false
+        contentType: false,
+        dataType: "json"
       })
-        .done(function (resposta) {
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Código enviado com sucesso para o seu e-mail!", "success");
-            self.estado.codigoGerado = true;
+      .done(function (resposta) {
+          if (resposta.sucesso === true) {
+              self.mostrarAlert(
+                  "Código enviado com sucesso para o seu e-mail!",
+                  "success"
+              );
+
+              self.estado.codigoGerado = true;
           } else {
-            self.mostrarAlert(resposta, "danger");
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível gerar o código.",
+                  "danger"
+              );
           }
-        })
-        .fail(function () {
-          console.error("Erro na requisição ao gerar código!");
-        });
+      })
+      .fail(function (xhr, status, erro) {
+          console.error("Erro ao gerar código:", status, erro, xhr.responseText);
+          self.mostrarAlert("Erro na requisição ao gerar código!", "danger");
+      });
     },
 
     ativarConta: function ($botao) {
@@ -307,7 +335,7 @@ console.log("JS cadCliente carregado");
 
       var fd = new FormData();
       fd.append("email", email);
-      fd.append("codigo", codigoDigitado);
+      fd.append("cod", codigoDigitado);
       fd.append("acao", "ativar");
 
       $.ajax({
@@ -315,33 +343,40 @@ console.log("JS cadCliente carregado");
         method: "POST",
         data: fd,
         processData: false,
-        contentType: false
+        contentType: false,
+        dataType: "json"
       })
-        .done(function (resposta) {
+      .done(function (resposta) {
           $botao.prop("disabled", false).html("Ativar");
-          if ($.trim(resposta) === "sucesso") {
-            self.mostrarAlert("Conta ativada com sucesso!", "success");
-            self.estado.codigoGerado = false;
 
-            setTimeout(function () {
-              window.location.href = self.configuracao.urlLogin;
-            }, 1500);
+          if (resposta.sucesso === true) {
+              self.mostrarAlert("Conta ativada com sucesso!", "success");
+              self.estado.codigoGerado = false;
 
+              setTimeout(function () {
+                  window.location.href = self.configuracao.urlLogin;
+              }, 1500);
           } else {
-            self.mostrarAlert(resposta, "danger");
+              $campoCodigo.addClass("is-invalid");
+
+              self.mostrarAlert(
+                  resposta.mensagem || "Não foi possível ativar a conta.",
+                  "danger"
+              );
           }
-        })
-        .fail(function (xhr, status, erro) {
+      })
+      .fail(function (xhr, status, erro) {
           $botao.prop("disabled", false).html("Ativar");
+
           console.error("Erro na ativação:", status, erro, xhr.responseText);
+
           self.mostrarAlert("Erro na requisição de ativação!", "danger");
-        });
+      });
     }
   };
 
   $(function () {
     moduloCadCliente.iniciar();
   });
-
 
 })(jQuery, window.ElmoUtilitarios);

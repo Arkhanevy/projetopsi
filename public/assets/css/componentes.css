@@ -1,402 +1,1297 @@
-/* ============================================================
-   COMPONENTES COMPARTILHADOS
-   Usado por todas as páginas (infoServico, agendamentoCli,
-   consultasCli). Depende de: variaveis.css (deve ser carregado
-   antes deste arquivo).
+/* ==================================================================
+   Arquivo original: fundacao/reset.css
+   ================================================================== */
+/*
+  Ajustes base sobre o Bootstrap 5.
+  Não reescreve o Bootstrap — conecta as variáveis raiz do Bootstrap
+  (--bs-*) às variáveis do Design System, para que qualquer componente
+  nativo do Bootstrap usado (Modal, Offcanvas, Dropdown, Navbar, Card,
+  form-check etc.) já nasça com a cor/tipografia/raio corretos, sem
+  precisar sobrescrever cada um manualmente.
+*/
 
-   Contém: navegação (lateral/topo/inferior), botão voltar,
-   botões de ação padrão, modal padrão (+ variantes), área de
-   conteúdo e estado de carregamento (skeleton).
-   ============================================================ */
+/* As classes d-flex/d-md-flex do Bootstrap usam !important, então o
+   atributo nativo [hidden] sozinho não venceria (ex.: navLateralLogado
+   usa "d-none d-md-flex"). sessaoNavegacao.js depende de [hidden]
+   realmente esconder o elemento até a sessão ser verificada. */
+[hidden] {
+  display: none !important;
+}
 
+/* Link "Pular para o conteúdo principal": invisível até receber foco
+   pelo teclado (primeiro Tab da página). */
 .linkPularConteudo {
   position: absolute;
-  top: -48px;
-  left: 8px;
-  z-index: 2000;
-  padding: var(--espacamentoSm) var(--espacamentoMd);
+  top: 0;
+  left: var(--espaco2);
+  z-index: 10000;
+  padding: var(--espaco2) var(--espaco4);
   background-color: var(--corBranco);
-  color: var(--corTexto);
+  color: var(--corLetras);
   border: 2px solid var(--corDestaque);
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 700;
-  transition: top 0.15s ease-in-out;
+  border-radius: var(--raioMedio);
+  transform: translateY(-120%);
 }
 
 .linkPularConteudo:focus {
-  top: 8px;
+  transform: translateY(var(--espaco2));
 }
 
-
-.navegacaoLateral {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: var(--larguraNavegacaoLateral);
-  background-color: var(--corBotaoPrincipal);
-  padding: var(--espacamentoLg) 0;
-  z-index: 1030;
+:root {
+  --bs-body-bg: var(--corFundo);
+  --bs-body-color: var(--corLetras);
+  --bs-body-font-family: var(--fonteBase);
+  --bs-body-font-size: var(--tamanhoBody);
+  --bs-border-color: var(--corBordas);
+  --bs-border-radius: var(--raioPequeno);
+  --bs-border-radius-lg: var(--raioMedio);
+  --bs-border-radius-pill: var(--raioTotal);
+  --bs-link-color: var(--corAcaoSecundaria);
+  --bs-link-hover-color: var(--corDestaque);
+  --bs-focus-ring-color: rgba(36, 24, 205, 0.35); /* baseado em --corFoco */
 }
 
-.marcaApp {
-  display: flex;
-  justify-content: center;
-  margin-bottom: var(--espacamentoXl);
+body {
+  font-family: var(--fonteBase);
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
+  background-color: var(--corFundo);
 }
 
-.logoApp {
-  width: 48px;
-  height: 48px;
-}
-
-.listaNavegacao {
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--fonteBase);
+  color: var(--corLetras);
+  font-weight: var(--pesoNegrito);
   margin: 0;
-  padding: 0;
-  width: 100%;
 }
 
-.itemNavegacao {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  margin: 0 auto;
-  border-radius: 999px;
-  color: var(--corBranco);
-  text-decoration: none;
-  transition: background-color 0.15s ease-in-out;
+h1 { font-size: var(--tamanhoH1); }
+h2 { font-size: var(--tamanhoH2); }
+h3 { font-size: var(--tamanhoH3); }
+
+small, .textoSmall { font-size: var(--tamanhoSmall); }
+.textoCaption { font-size: var(--tamanhoCaption); }
+
+/* Indicador de foco visível — nunca remover sem alternativa (regra 11) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--larguraFoco) solid var(--corFoco);
+  outline-offset: 2px;
 }
 
-.itemNavegacao:hover {
-  background-color: rgba(255, 255, 255, 0.25);
-}
-
-.itemNavegacaoAtivo {
-  background-color: var(--corBranco);
-  color: var(--corDestaque);
-}
-
-.itemNavegacaoAtivo:hover {
-  background-color: var(--corBranco);
-}
-
-
-.cabecalhoMobile {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--alturaCabecalhoMobile);
-  padding: 0 var(--espacamentoMd);
-  background-color: var(--corBotaoPrincipal);
-  z-index: 1030;
-}
-
-.marcaAppMobile {
-  text-decoration: none;
-  color: var(--corTexto);
-}
-
-.logoAppMobile {
-  width: 32px;
-  height: 32px;
-}
-
-.nomeApp {
-  font-size: var(--fonteTamanhoH3);
-  font-weight: 700;
-  color: var(--corTexto);
-}
-
-.botaoMenuMobile {
-  border: none;
-  background: transparent;
-  color: var(--corTexto);
-  padding: var(--espacamentoXs);
+/* Ícones Material Symbols — ajuste de alinhamento vertical padrão */
+.material-symbols-outlined {
+  vertical-align: middle;
+  line-height: 1;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
 }
 
 
-.navegacaoInferior {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: var(--alturaNavegacaoInferior);
-  background-color: var(--corBotaoPrincipal);
-  padding: 0 var(--espacamentoMd);
-  z-index: 1030;
-}
+/* ==================================================================
+   Arquivo original: botao/botao.css
+   ================================================================== */
+/*
+  Componente: botaoBase
+  Convertido para usar a classe .btn do Bootstrap 5 como base —
+  o Bootstrap já cuida de padding, transição, foco visível e estado
+  desabilitado. Aqui só sobrescrevemos as variáveis de cor/forma do
+  Bootstrap (--bs-btn-*) para respeitar o Design System, já que as
+  cores do projeto não são as cores padrão do Bootstrap.
 
-.itemNavegacaoInferior {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 999px;
-  color: var(--corBranco);
-  text-decoration: none;
-}
+  Estrutura-base: .btn.botaoBase + variantes de cor + --longo.
+*/
 
-.itemNavegacaoInferiorAtivo {
-  background-color: var(--corBranco);
-  color: var(--corDestaque);
-  transform: translateY(-8px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
+.botaoBase {
+  --bs-btn-font-family: var(--fonteBase);
+  --bs-btn-font-size: var(--tamanhoBody);
+  --bs-btn-font-weight: var(--pesoNegrito);
+  --bs-btn-line-height: 1;
+  --bs-btn-padding-x: var(--espaco5);
+  --bs-btn-padding-y: var(--espaco3);
+  --bs-btn-border-radius: var(--raioTotal);
+  --bs-btn-border-width: var(--larguraBorda);
+  --bs-btn-border-color: var(--corBordas);
+  --bs-btn-hover-border-color: var(--corBordas);
+  --bs-btn-active-border-color: var(--corBordas);
+  --bs-btn-color: var(--corBranco);
+  --bs-btn-hover-color: var(--corBranco);
+  --bs-btn-active-color: var(--corBranco);
+  --bs-btn-disabled-opacity: 0.5;
+  --bs-btn-box-shadow: none;
+  --bs-btn-focus-box-shadow: 0 0 0 var(--larguraFoco) var(--corFoco);
 
-
-
-.areaConteudo {
-  padding-top: calc(var(--alturaCabecalhoMobile) + var(--espacamentoMd));
-  padding-bottom: calc(var(--alturaNavegacaoInferior) + var(--espacamentoMd));
-}
-
-@media (min-width: 768px) {
-  .areaConteudo {
-    margin-left: var(--larguraNavegacaoLateral);
-    padding-top: var(--espacamentoLg);
-    padding-bottom: var(--espacamentoLg);
-  }
-}
-
-.conteudoPagina {
-  padding-left: var(--espacamentoMd);
-  padding-right: var(--espacamentoMd);
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-
-.botaoVoltar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border: 1px solid var(--corDestaque);
-  background-color: transparent;
-  color: var(--corDestaque);
-  margin-bottom: var(--espacamentoLg);
-}
-
-.botaoVoltar:hover {
-  background-color: var(--corBotaoPrincipal);
-}
-
-
-.botaoPrimario {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--espacamentoXs);
-  background-color: var(--corBotaoPrincipal);
-  color: var(--corBranco);
-  border: none;
-  font-weight: 700;
-  font-size: var(--fonteTamanhoBody);
-  padding: var(--espacamentoSm) var(--espacamentoXl);
+  gap: var(--espaco2);
+  white-space: nowrap;
 }
 
-.botaoPrimario:hover {
+.botaoBase .material-symbols-outlined {
+  font-size: 1.25em;
+}
+
+/* Variantes de cor/função — cada uma só redefine as variáveis do Bootstrap */
+.botaoBase--primario {
+  --bs-btn-bg: var(--corBotoes);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--corBotoes) 90%, white);
+  --bs-btn-active-bg: color-mix(in srgb, var(--corBotoes) 85%, black);
+}
+
+.botaoBase--secundario {
+  --bs-btn-bg: var(--corAcaoSecundaria);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--corAcaoSecundaria) 90%, white);
+  --bs-btn-active-bg: color-mix(in srgb, var(--corAcaoSecundaria) 85%, black);
+}
+
+.botaoBase--opositora {
+  --bs-btn-bg: var(--corAcaoNegativa);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--corAcaoNegativa) 90%, white);
+  --bs-btn-active-bg: color-mix(in srgb, var(--corAcaoNegativa) 85%, black);
+}
+
+.botaoBase--extra {
+  --bs-btn-bg: var(--corAcaoExtra);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--corAcaoExtra) 90%, white);
+  --bs-btn-active-bg: color-mix(in srgb, var(--corAcaoExtra) 85%, black);
+}
+
+/* Tamanho expandido (ex.: "Botão longooooo") */
+.botaoBase--longo {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Responsividade — botões um pouco mais compactos no mobile */
+@media (max-width: 575.98px) {
+  .botaoBase {
+    --bs-btn-padding-x: var(--espaco4);
+    --bs-btn-padding-y: var(--espaco2);
+    --bs-btn-font-size: var(--tamanhoSmall);
+  }
+}
+
+
+/* ==================================================================
+   Arquivo original: status/status.css
+   ================================================================== */
+/*
+  Componente: indicadorStatus
+  Não é um componente nativo do Bootstrap (o .badge do Bootstrap é
+  pensado para contadores pequenos, não para esta pílula com ícone),
+  então mantemos a estrutura própria. Usamos os utilitários do
+  Bootstrap (d-inline-flex, align-items-center, gap-2) no HTML para
+  o layout interno, mas padding/raio ficam no CSS próprio porque a
+  escala de espaçamento do Bootstrap não corresponde exatamente à
+  escala definida no Design System (regra 8 — não forçar o Bootstrap
+  a substituir decisões visuais próprias).
+*/
+
+.indicadorStatus {
+  font-family: var(--fonteBase);
+  font-size: var(--tamanhoBody);
+  font-weight: var(--pesoNegrito);
+  color: var(--corBranco);
+  border: var(--larguraBorda) solid var(--corBordas);
+  border-radius: var(--raioTotal);
+  padding: var(--espaco3) var(--espaco5);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.indicadorStatus .material-symbols-outlined {
+  font-size: 1.25em;
+}
+
+.indicadorStatus--agendada,
+.indicadorStatus--confirmada {
+  background-color: var(--corBotoes);
+}
+
+.indicadorStatus--pendente {
+  background-color: var(--corAcaoAtencao);
+  /* Mantido conforme o Figma (texto branco). Atenção: #E0A800 com texto
+     branco tem contraste abaixo de 4.5:1 (AA para texto pequeno) — ver
+     nota de acessibilidade sobre este ponto antes de finalizar. */
+}
+
+.indicadorStatus--cancelada {
+  background-color: var(--corAcaoNegativa);
+}
+
+.indicadorStatus--realizada {
+  background-color: var(--corAcaoSecundaria);
+}
+
+@media (max-width: 575.98px) {
+  .indicadorStatus {
+    font-size: var(--tamanhoSmall);
+  }
+}
+
+
+/* ==================================================================
+   Arquivo original: campo/campo.css
+   ================================================================== */
+/*
+  Componentes: campoTexto, campoPesquisa, campoSelect
+  Convertidos para usar estruturas nativas do Bootstrap 5:
+    - campoTexto  -> .form-floating + .form-control (o rótulo já
+      "flutua" sobre a borda ao focar/preencher, sem precisar de JS)
+    - campoPesquisa -> .input-group (input + botão acoplado)
+    - campoSelect  -> .dropdown (Bootstrap cuida de abrir/fechar,
+      clique fora e Esc; só sobrescrevemos a aparência)
+  Aqui ficam só as cores/formas do Design System, sobre as variáveis
+  nativas do Bootstrap (--bs-*).
+*/
+
+/* ============================= */
+/* Variante: campoTexto (.form-floating) */
+/* ============================= */
+.campoTexto {
+  margin-top: var(--espaco3);
+}
+
+.campoTexto .form-control {
+  --bs-border-color: var(--corBordas);
+  --bs-body-color: var(--corLetras);
+  border-radius: var(--raioPequeno);
+  border-width: var(--larguraBorda);
+}
+
+.campoTexto .form-control:focus {
+  border-color: var(--corBordas);
+  box-shadow: 0 0 0 var(--larguraFoco) var(--corFoco);
+}
+
+.campoTexto label {
+  font-weight: var(--pesoNegrito);
+  color: var(--corLetras);
+}
+
+/* Estado: erro — reaproveita o padrão is-invalid do Bootstrap */
+.campoTexto .form-control.is-invalid {
+  border-color: var(--corAcaoNegativa);
+  background-image: none; /* remove o ícone de alerta padrão do Bootstrap */
+}
+
+.campoTexto .form-control.is-invalid ~ label {
+  color: var(--corAcaoNegativa);
+}
+
+/* ============================= */
+/* Variante: campoPesquisa (.input-group) */
+/* ============================= */
+.campoPesquisa .form-control {
+  --bs-border-color: var(--corBordas);
+  border-right: none;
+  border-top-left-radius: var(--raioMedio);
+  border-bottom-left-radius: var(--raioMedio);
+}
+
+.campoPesquisa .form-control:focus {
+  box-shadow: none;
+  border-color: var(--corBordas);
+}
+
+.campoPesquisa_botaoIcone {
+  border: var(--larguraBorda) solid var(--corBordas);
+  border-left: none;
+  border-top-right-radius: var(--raioMedio);
+  border-bottom-right-radius: var(--raioMedio);
   background-color: var(--corDestaque);
   color: var(--corBranco);
 }
 
-.botaoPrimario:disabled {
-  background-color: var(--corBotaoPrincipal);
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.botaoCancelar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--espacamentoXs);
-  background-color: var(--corErro);
+.campoPesquisa_botaoIcone:hover,
+.campoPesquisa_botaoIcone:focus-visible {
+  background-color: var(--corDestaque);
   color: var(--corBranco);
-  border: none;
-  font-weight: 700;
-  font-size: var(--fonteTamanhoBody);
-  padding: var(--espacamentoSm) var(--espacamentoXl);
-  opacity: 0.85;
+  filter: brightness(1.1);
 }
 
-.botaoCancelar:hover {
-  opacity: 1;
-  color: var(--corBranco);
+/* ============================= */
+/* Variante: campoSelect (.dropdown) */
+/* ============================= */
+.campoSelect {
+  margin-top: var(--espaco3);
 }
 
-.botaoSecundario {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--espacamentoXs);
-  background-color: var(--corBotaoSecundario);
-  color: var(--corBranco);
-  border: none;
-  font-weight: 700;
-  font-size: var(--fonteTamanhoBody);
-  padding: var(--espacamentoSm) var(--espacamentoXl);
+.campoSelect_gatilho {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  padding: 0;
+  border: var(--larguraBorda) solid var(--corBordas);
+  border-radius: var(--raioPequeno);
+  background-color: var(--corBranco);
+  overflow: hidden;
 }
 
-.botaoSecundario:hover {
-  opacity: 0.9;
-  color: var(--corBranco);
+/* Remove o caret padrão do .dropdown-toggle — usamos nosso próprio ícone */
+.campoSelect_gatilho.dropdown-toggle::after {
+  display: none;
 }
 
-
-.popover {
-  --bs-popover-max-width: 260px;
-  --bs-popover-border-width: 2px;
-  --bs-popover-border-color: var(--corBorda);
-  --bs-popover-bg: var(--corFundo);
-  --bs-popover-header-bg: var(--corFundo);
-  --bs-popover-header-color: var(--corTexto);
-  --bs-popover-body-color: var(--corTexto);
-  --bs-popover-body-padding-x: var(--espacamentoMd);
-  --bs-popover-body-padding-y: var(--espacamentoSm);
+.campoSelect_valor {
+  flex: 1;
+  text-align: left;
+  padding: var(--espaco4);
+  font-family: var(--fonteBase);
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
 }
 
-.popover-header {
-  font-weight: 700;
-  border-bottom: 1px solid var(--corBorda);
-}
-
-
-.modalPadrao .modal-content {
-  background-color: var(--corFundo);
-  border: 2px solid var(--corBorda);
-  border-radius: 16px;
-  padding: var(--espacamentoLg);
-  position: relative;
-}
-
-.tituloModal {
-  font-weight: 700;
-  margin-bottom: var(--espacamentoMd);
-}
-
-.textoModal {
-  font-size: var(--fonteTamanhoBody);
-  margin-bottom: var(--espacamentoMd);
-}
-
-.textoRodapeModal {
-  font-size: var(--fonteTamanhoCaption);
-  margin-top: var(--espacamentoMd);
-  margin-bottom: 0;
-}
-
-.linkTexto {
-  color: var(--corBotaoSecundario);
-  font-weight: 700;
-  text-decoration: underline;
-}
-
-
-.iconeModal {
-  position: relative;
-  width: 96px;
-  height: 96px;
-  margin: 0 auto var(--espacamentoMd) auto;
-  border: 1px solid var(--corBorda);
+.campoSelect_iconeChevron {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 var(--espaco4);
+  background-color: var(--corDestaque);
+  color: var(--corBranco);
 }
 
-.iconeModalBase {
+/* Estado: erro */
+.campoSelect--erro .campoSelect_gatilho {
+  border-color: var(--corAcaoNegativa);
+}
+
+.campoSelect--erro .campoSelect_valor {
+  color: var(--corAcaoNegativa);
+}
+
+.campoSelect--erro .campoSelect_iconeChevron {
+  background-color: var(--corAcaoNegativa);
+}
+
+/* .dropdown-menu já vem com posicionamento/Popper do Bootstrap —
+   só ajustamos aparência para bater com o Design System */
+.campoSelect_lista {
+  width: 100%;
+  margin-top: 0 !important;
+  padding: 0;
+  border: var(--larguraBorda) solid var(--corBordas);
+  border-top: none;
+  border-radius: 0 0 var(--raioPequeno) var(--raioPequeno);
+}
+
+.campoSelect_opcao {
+  padding: var(--espaco3) var(--espaco4);
+  border-top: 1px solid var(--corBordas);
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
+}
+
+.campoSelect_opcao:hover,
+.campoSelect_opcao:focus-visible {
+  background-color: var(--corFundoClaro);
+  color: var(--corLetras);
+}
+
+
+/* ==================================================================
+   Arquivo original: filtro/filtro.css
+   ================================================================== */
+/*
+  Componente: painelFiltro
+  Os rádios agora usam .form-check/.form-check-input do Bootstrap
+  (acessibilidade e estados de foco/disabled já vêm prontos) — aqui só
+  sobrescrevemos a cor do estado marcado para bater com o Design System.
+*/
+
+.painelFiltro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco6);
+  width: 100%;
+  max-width: 360px;
+  border: var(--larguraBorda) solid var(--corBordas);
+  border-radius: var(--raioMedio);
+  background-color: var(--corFundo);
+  padding: var(--espaco5);
+}
+
+.grupoFiltro_titulo {
+  margin-bottom: var(--espaco3);
+  font-size: var(--tamanhoH3);
+}
+
+.grupoFiltro .form-check {
+  padding-left: 0;
+  margin-bottom: var(--espaco2);
+}
+
+.grupoFiltro .form-check-input {
+  width: 22px;
+  height: 22px;
+  margin-top: 0;
+  margin-right: var(--espaco2);
+  border: var(--larguraBorda) solid var(--corLetras);
+  cursor: pointer;
+}
+
+.grupoFiltro .form-check-input:checked {
+  background-color: var(--corAcaoSecundaria);
+  border-color: var(--corAcaoSecundaria);
+}
+
+.grupoFiltro .form-check-input.is-invalid {
+  border-color: var(--corAcaoNegativa);
+}
+
+.grupoFiltro .form-check-input:focus {
+  box-shadow: 0 0 0 var(--larguraFoco) var(--corFoco);
+}
+
+.grupoFiltro .form-check-label {
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
+  cursor: pointer;
+}
+
+.painelFiltro_rodape {
+  display: flex;
+  justify-content: center;
+}
+
+
+/* ==================================================================
+   Arquivo original: calendario/calendario.css
+   ================================================================== */
+/*
+  Componente: calendarioBase
+  Sem componente nativo do Bootstrap equivalente a um calendário —
+  mantemos a estrutura própria, mas: (1) o botão de navegação usa a
+  classe .btn com variáveis --bs-btn-* (mesmo padrão do botaoBase);
+  (2) cabeçalho e legenda usam utilitários do Bootstrap no HTML
+  (d-flex, align-items-center, gap-*, flex-wrap) em vez de flex/gap
+  declarados aqui. Só ficam aqui a grade de dias e os estados visuais
+  específicos do Design System, que não têm equivalente no Bootstrap.
+*/
+
+.calendarioBase {
+  width: 100%;
+  max-width: 420px;
+  border: var(--larguraBorda) solid var(--corBordas);
+  border-radius: var(--raioMedio);
+  background-color: var(--corBranco);
+  padding: var(--espaco5);
+}
+
+.calendarioBase_tituloMes {
+  font-size: var(--tamanhoH2);
+  min-width: 10ch;
+  text-align: center;
+}
+
+.calendarioBase_botaoNavegacao {
+  --bs-btn-padding-x: 0;
+  --bs-btn-padding-y: 0;
+  --bs-btn-border-radius: 50%;
+  --bs-btn-border-width: var(--larguraBorda);
+  --bs-btn-border-color: var(--corDestaque);
+  --bs-btn-hover-border-color: var(--corDestaque);
+  --bs-btn-active-border-color: var(--corDestaque);
+  --bs-btn-color: var(--corDestaque);
+  --bs-btn-bg: var(--corBranco);
+  --bs-btn-hover-color: var(--corDestaque);
+  --bs-btn-hover-bg: var(--corFundoClaro);
+  --bs-btn-active-color: var(--corDestaque);
+  --bs-btn-active-bg: var(--corFundoClaro);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.calendarioBase_grade {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--espaco2);
+  text-align: center;
+}
+
+.calendarioBase_diaSemana {
+  font-weight: var(--pesoNegrito);
+  font-size: var(--tamanhoSmall);
+  padding-bottom: var(--espaco2);
+}
+
+.calendarioBase_dia {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border: var(--larguraBorda) solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  font-family: var(--fonteBase);
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
+  cursor: pointer;
+}
+
+.calendarioBase_dia:hover:not(:disabled) {
+  background-color: var(--corFundoClaro);
+}
+
+.calendarioBase_dia:disabled {
+  color: #aaaaaa;
+  cursor: default;
+}
+
+.calendarioBase_dia--vazio {
+  visibility: hidden;
+}
+
+/* Estado: selecionado */
+.calendarioBase_dia--selecionado {
+  background-color: var(--corAcaoSecundaria);
+  color: var(--corBranco);
+  font-weight: var(--pesoNegrito);
+}
+
+/* Estado: indisponível (cliente) / dia de folga (profissional) */
+.calendarioBase_dia--indisponivel,
+.calendarioBase_dia--folga {
+  border-color: var(--corAcaoNegativa);
+}
+
+/* Estado: consulta confirmada — indicador em ponto abaixo do número */
+.calendarioBase_dia--confirmada::after,
+.calendarioBase_dia--pendente::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.calendarioBase_dia--confirmada::after {
+  background-color: var(--corDestaque);
+}
+
+.calendarioBase_dia--pendente::after {
+  background-color: transparent;
+  border: 2px solid var(--corAcaoAtencao);
+  width: 8px;
+  height: 8px;
+}
+
+/* Legenda */
+.calendarioBase_marcadorLegenda {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.calendarioBase_marcadorLegenda--selecionado {
+  background-color: var(--corAcaoSecundaria);
+}
+
+.calendarioBase_marcadorLegenda--indisponivel,
+.calendarioBase_marcadorLegenda--folga {
+  background-color: transparent;
+  border: 2px solid var(--corAcaoNegativa);
+}
+
+.calendarioBase_marcadorLegenda--confirmada {
+  border-radius: 50%;
+  background-color: var(--corDestaque);
+}
+
+.calendarioBase_marcadorLegenda--pendente {
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid var(--corAcaoAtencao);
+}
+
+@media (max-width: 575.98px) {
+  .calendarioBase {
+    padding: var(--espaco4);
+  }
+
+  .calendarioBase_tituloMes {
+    font-size: var(--tamanhoH3);
+  }
+}
+
+
+/* ==================================================================
+   Arquivo original: modal/modal.css
+   ================================================================== */
+/*
+  Componente: modalBase
+  Convertido para o Modal nativo do Bootstrap 5 (.modal/.modal-dialog/
+  .modal-content) — abrir, fechar, overlay, ESC e foco preso já vêm
+  prontos via data-bs-toggle/data-bs-dismiss, sem precisar de JS próprio.
+  Aqui só sobrescrevemos as variáveis do Bootstrap (--bs-modal-*) para
+  aplicar as cores/raio do Design System.
+*/
+
+.modalBase {
+  --bs-modal-color: var(--corLetras);
+  --bs-modal-bg: var(--corFundo);
+  --bs-modal-border-color: var(--corBordas);
+  --bs-modal-border-width: var(--larguraBorda);
+  --bs-modal-border-radius: var(--raioMedio);
+  --bs-modal-header-border-color: transparent;
+  --bs-modal-footer-border-color: transparent;
+  --bs-backdrop-bg: var(--corLetras);
+  --bs-backdrop-opacity: 0.6;
+}
+
+.modalBase_conteudo {
+  padding: var(--espaco4) var(--espaco2);
+  text-align: center;
+}
+
+.modalBase_cabecalho {
+  position: relative;
+  justify-content: center;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.modalBase_titulo {
+  font-size: var(--tamanhoH2);
+}
+
+.modalBase_botaoFechar {
+  position: absolute;
+  top: calc(-1 * var(--espaco4));
+  right: calc(-1 * var(--espaco2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: var(--larguraBorda) solid var(--corAcaoNegativa);
+  background-color: var(--corBranco);
+  color: var(--corAcaoNegativa);
+  cursor: pointer;
+}
+
+.modalBase_botaoFechar:hover {
+  background-color: var(--corFundoClaro);
+}
+
+.modalBase_corpo {
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
+  text-align: left;
+}
+
+.modalBase_rodape {
+  justify-content: center;
+  border-top: none;
+  padding-top: 0;
+  gap: var(--espaco3);
+}
+
+/* Variante: modalMidia — imagem/ilustração entre título e texto */
+.modalMidia_imagem {
+  display: block;
+  max-width: 220px;
+  width: 100%;
+  min-height: 140px;
+  margin: 0 auto var(--espaco4);
+  border: var(--larguraBorda) solid var(--corBordas);
+  background-color: var(--corBranco);
+}
+
+/* Variante: modalFeedback — ícone grande + mensagem centralizada + botão único */
+.modalFeedback_icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 90px;
+  margin: 0 auto var(--espaco4);
+  border: var(--larguraBorda) solid var(--corBordas);
+  background-color: var(--corBranco);
+}
+
+.modalFeedback_icone .material-symbols-outlined {
   font-size: 56px;
-  color: var(--corBorda);
+  color: var(--corLetras);
 }
 
-.iconeModalSobreposto {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  font-size: 28px;
-  color: var(--corErro);
-  background-color: var(--corBranco);
-  border-radius: 999px;
+.modalFeedback_mensagem {
+  text-align: center;
+  margin-bottom: 0;
 }
 
 
-.botaoFecharModal {
-  position: absolute;
-  top: -16px;
-  right: -16px;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
+/* ==================================================================
+   Arquivo original: cards/cardEntidade.css
+   ================================================================== */
+/*
+  Estrutura-base: cardEntidadeBase
+  Convertida para usar .card/.card-body/.card-title/.card-img-top do
+  Bootstrap — aqui só sobrescrevemos as variáveis (--bs-card-*) para
+  aplicar cor, borda e raio do Design System.
+  Compartilhada por cardProfissional, cardClinica e cardServico.
+*/
+
+.cardEntidadeBase {
+  --bs-card-border-color: var(--corBordas);
+  --bs-card-border-width: var(--larguraBorda);
+  --bs-card-border-radius: var(--raioMedio);
+  --bs-card-bg: var(--corBranco);
+  --bs-card-spacer-y: var(--espaco5);
+  --bs-card-spacer-x: var(--espaco5);
+  width: 100%;
+  max-width: 300px;
+}
+
+.cardEntidadeBase_titulo {
+  color: var(--corDestaque);
+  font-size: var(--tamanhoH3);
+}
+
+.cardEntidadeBase_imagem {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-bottom: var(--larguraBorda) solid var(--corBordas);
+  background-color: #d9d9d9;
+}
+
+/* Variante: cardClinica — linhas extra de endereço/CEP, alinhadas à esquerda */
+.cardClinica_info {
+  align-self: flex-start;
+  text-align: left;
+  font-weight: var(--pesoNegrito);
+  font-size: var(--tamanhoSmall);
+}
+
+.cardClinica_info p {
+  margin: 0;
+}
+
+/* Variante: cardServico — linha de preço/cidade */
+.cardServico_metadados {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
+}
+
+
+/* ==================================================================
+   Arquivo original: cards/cardDocumento.css
+   ================================================================== */
+/*
+  Componente: cardDocumento
+  Convertido para .card/.card-body do Bootstrap — sem imagem.
+*/
+
+.cardDocumento {
+  --bs-card-border-color: var(--corBordas);
+  --bs-card-border-width: var(--larguraBorda);
+  --bs-card-border-radius: var(--raioMedio);
+  --bs-card-bg: var(--corBranco);
+  --bs-card-spacer-y: var(--espaco5);
+  --bs-card-spacer-x: var(--espaco5);
+  width: 100%;
+  max-width: 360px;
+}
+
+.cardDocumento_titulo {
+  text-align: center;
+  color: var(--corDestaque);
+  font-size: var(--tamanhoH3);
+}
+
+.cardDocumento_dados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 2.5em;
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
+}
+
+.cardDocumento_dados li {
+  line-height: 1.4;
+}
+
+.cardDocumento_rodape .botaoBase {
+  flex: 1;
+  min-width: 130px;
+}
+
+
+/* ==================================================================
+   Arquivo original: cards/cardConsulta.css
+   ================================================================== */
+/*
+  Componente: cardConsulta (visão cliente)
+  Convertido para .card/.card-body do Bootstrap.
+*/
+
+.cardConsulta {
+  --bs-card-border-color: var(--corBordas);
+  --bs-card-border-width: var(--larguraBorda);
+  --bs-card-border-radius: var(--raioMedio);
+  --bs-card-bg: var(--corBranco);
+  --bs-card-spacer-y: var(--espaco5);
+  --bs-card-spacer-x: var(--espaco5);
+  width: 100%;
+  max-width: 380px;
+}
+
+.cardConsulta_titulo {
+  text-align: center;
+  font-size: var(--tamanhoH3);
+}
+
+.cardConsulta_linhaTopo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--tamanhoBody);
+}
+
+.cardConsulta_detalhes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco2);
+  font-size: var(--tamanhoBody);
+  color: var(--corLetras);
+}
+
+.cardConsulta_rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--espaco3);
+}
+
+/* Quando não há botão de cancelar (Cancelada/Realizada), o status
+   ocupa o espaço sozinho, alinhado à direita — conforme o Figma. */
+.cardConsulta_rodape--somenteStatus {
+  justify-content: flex-end;
+}
+
+
+/* ==================================================================
+   Arquivo original: cards/cardConsultaProfissional.css
+   ================================================================== */
+/*
+  Componente: cardConsultaProfissional
+  Convertido para .card/.card-body do Bootstrap. Estrutura compacta
+  (linha), visão do profissional.
+*/
+
+.cardConsultaProfissional {
+  --bs-card-border-color: var(--corBordas);
+  --bs-card-border-width: var(--larguraBorda);
+  --bs-card-border-radius: var(--raioMedio);
+  --bs-card-bg: var(--corFundo);
+  --bs-card-spacer-y: var(--espaco4);
+  --bs-card-spacer-x: var(--espaco5);
+  width: 100%;
+  max-width: 480px;
+}
+
+.cardConsultaProfissional_cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--tamanhoBody);
+}
+
+.cardConsultaProfissional_servico {
+  font-weight: var(--pesoRegular);
+}
+
+.cardConsultaProfissional_dataHora {
+  font-weight: var(--pesoNegrito);
+}
+
+.cardConsultaProfissional_acoes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--espaco3);
+}
+
+/* Quando o slot de ações tem só um item (ex.: Cancelada, Realizada),
+   ele fica alinhado à direita */
+.cardConsultaProfissional_acoes--somenteUmItem {
+  justify-content: flex-end;
+}
+
+
+/* ==================================================================
+   Arquivo original: navegacao/navTopoDeslogado.css
+   ================================================================== */
+/*
+  Componente: navTopoDeslogado
+  Convertido para usar duas .navbar do Bootstrap (topo + barra
+  secundária) — sem sub-itens (confirmado), então dispensamos o
+  .navbar-toggler/.navbar-collapse. Aqui só sobrescrevemos as
+  variáveis (--bs-navbar-*) para aplicar as cores do Design System.
+*/
+
+/* Menu estático: acompanha a rolagem, sempre visível no topo da tela.
+   "sticky" mantém o menu no fluxo da página (não cobre o conteúdo e não
+   exige compensar altura), desde que seja filho direto do <body>. */
+.navTopoDeslogado {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navTopoDeslogado_barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--espaco3) var(--espaco5);
+    background-color: var(--corDestaque);
+}
+
+
+.navTopoDeslogado_logo {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco2);
+
+  color: var(--corBranco);
+  text-decoration: none;
+}
+
+.navTopoDeslogado_logo:hover,
+.navTopoDeslogado_logo:focus-visible {
+    color: var(--corBranco);
+}
+
+
+.navTopoDeslogado_logo .material-symbols-outlined {
+  font-size: 1.5em;
+}
+
+.navTopoDeslogado_acoes {
+    display: flex;
+    align-items: center;
+    gap: var(--espaco5);
+}
+
+.navTopoDeslogado_acoes .nav-link:hover,
+.navTopoDeslogado_acoes .nav-link:focus-visible {
+  text-decoration: underline;
+}
+
+.navTopoDeslogado_secundaria {
+  --bs-navbar-padding-y: var(--espaco3);
+  --bs-navbar-padding-x: var(--espaco5);
+  --bs-navbar-nav-link-padding-x: 0;
+  --bs-nav-link-color: var(--corLetras);
+  --bs-nav-link-hover-color: var(--corLetras);
+  background-color: var(--corBotoes);
+}
+
+.navTopoDeslogado_secundaria .nav-link {
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+.navTopoDeslogado_secundaria .nav-link:hover,
+.navTopoDeslogado_secundaria .nav-link:focus-visible,
+.navTopoDeslogado_secundaria .nav-link.active {
+  font-weight: var(--pesoNegrito);
+  border-bottom-color: var(--corLetras);
+}
+
+@media (max-width: 991.98px) {
+  .navTopoDeslogado_secundaria {
+    display: none; /* no mobile, a navegação vira o painelMenuMobile (offcanvas) */
+  }
+}
+
+
+/* ==================================================================
+   Arquivo original: navegacao/painelMenuMobile.css
+   ================================================================== */
+/*
+  Estrutura-base: painelMenuMobile
+  Convertida para o Offcanvas nativo do Bootstrap (.offcanvas,
+  variante .offcanvas-top esticada para 100% da altura) — abrir,
+  fechar, overlay e Esc já vêm prontos via data-bs-toggle="offcanvas"
+  / data-bs-dismiss="offcanvas". Reutilizada por:
+    - menu deslogado mobile (variante --deslogado)
+    - menu hambúrguer logado mobile (variante --logado)
+  Aqui só sobrescrevemos as variáveis (--bs-offcanvas-*) do Bootstrap.
+*/
+
+.painelMenuMobile {
+  --bs-offcanvas-height: 100vh;
+  --bs-offcanvas-color: var(--corBranco);
+  --bs-offcanvas-bg: var(--corDestaque);
+  --bs-offcanvas-border-width: 0;
+  --bs-offcanvas-padding-x: var(--espaco5);
+  --bs-offcanvas-padding-y: var(--espaco3);
+}
+
+.painelMenuMobile_logo {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco2);
+  color: var(--corBranco);
+  font-size: var(--tamanhoH3);
+  text-decoration: none;
+}
+
+.painelMenuMobile_botaoFechar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: var(--larguraBorda) solid var(--corAcaoNegativa);
   background-color: var(--corBranco);
-  border: 2px solid var(--corErro);
+  color: var(--corAcaoNegativa);
+  cursor: pointer;
+}
+
+.painelMenuMobile_lista {
+  list-style: none;
+  margin: 0;
+  padding: var(--espaco2) 0 0;
+}
+
+.painelMenuMobile_item {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco3);
+  padding: var(--espaco4) var(--espaco5);
+  margin: 0 calc(-1 * var(--espaco5));
+  color: var(--corBranco);
+  font-size: var(--tamanhoBody);
+  font-weight: var(--pesoNegrito);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.painelMenuMobile_item:hover,
+.painelMenuMobile_item:focus-visible,
+.painelMenuMobile_item--ativo {
+  background-color: var(--corBranco);
+  color: var(--corLetras);
+}
+
+.painelMenuMobile_rodape {
+  list-style: none;
+  margin-top: auto;
+  padding: 0;
+}
+
+/* Apenas para a demonstração nesta página — o Offcanvas real do
+   Bootstrap usa "position: fixed" e cobre a tela inteira ao abrir. */
+.painelMenuMobile--demo {
+  position: absolute !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+
+/* ==================================================================
+   Arquivo original: navegacao/navLateralLogado.css
+   ================================================================== */
+/*
+  Componente: navLateralLogado (desktop)
+  Sidebar vertical de ícones, sem sub-itens (confirmado).
+  Variante de papel (data-papel) só troca o primeiro item — ver navegacao.js.
+  Ao passar o mouse/focar, expande para mostrar os rótulos (confirmado).
+*/
+
+.navLateralLogado {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--corDestaque);
+  overflow: hidden;
+  transition: width 0.15s ease;
+  z-index: 900;
+}
+
+.navLateralLogado:hover,
+.navLateralLogado:focus-within {
+  width: 240px;
+}
+
+.navLateralLogado_item {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco3);
+  padding: var(--espaco4);
+  color: var(--corBranco);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navLateralLogado_item .material-symbols-outlined {
+  font-size: 1.5em;
+  flex-shrink: 0;
+}
+
+.navLateralLogado_rotulo {
+  opacity: 0;
+  font-size: var(--tamanhoBody);
+  font-weight: var(--pesoNegrito);
+  transition: opacity 0.15s ease;
+}
+
+.navLateralLogado:hover .navLateralLogado_rotulo,
+.navLateralLogado:focus-within .navLateralLogado_rotulo {
   opacity: 1;
 }
 
+.navLateralLogado_item:hover,
+.navLateralLogado_item:focus-visible,
+.navLateralLogado_item--ativo {
+  background-color: var(--corBranco);
+  color: var(--corLetras);
+}
 
-.alertaValidacao {
-  background-color: var(--corErro);
+.navLateralLogado_rodape {
+  margin-top: auto;
+}
+
+/* Apenas para a demonstração nesta página — o componente real usa
+   "position: fixed" para ficar preso à lateral da tela. */
+.navLateralLogado--demo {
+  position: relative;
+  height: 420px;
+}
+
+
+/* ==================================================================
+   Arquivo original: navegacao/navInferiorLogado.css
+   ================================================================== */
+/*
+  Componente: navInferiorLogado (mobile)
+  Bottom tab bar, sem sub-itens (confirmado). Mesma lógica de papel
+  do navLateralLogado (ver navegacao.js) — só muda o item "Buscar/Início".
+*/
+
+.navInferiorLogado {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background-color: var(--corDestaque);
+  z-index: 900;
+}
+
+.navInferiorLogado_item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--espaco2) 0;
   color: var(--corBranco);
-  border: 2px solid var(--corBorda);
-  border-radius: 12px;
-  padding: var(--espacamentoMd);
-  text-align: center;
-  font-weight: 700;
-  margin-bottom: var(--espacamentoLg);
+  text-decoration: none;
+}
+
+.navInferiorLogado_item .material-symbols-outlined {
+  font-size: 1.4em;
+}
+
+.navInferiorLogado_rotulo {
+  font-size: var(--tamanhoCaption);
+  font-weight: var(--pesoNegrito);
+}
+
+.navInferiorLogado_item:hover,
+.navInferiorLogado_item:focus-visible,
+.navInferiorLogado_item--ativo {
+  background-color: var(--corBranco);
+  color: var(--corLetras);
+}
+
+/* Apenas para a demonstração nesta página */
+.navInferiorLogado--demo {
+  position: relative;
 }
 
 
-.campoComErro {
-  border-color: var(--corErro) !important;
-  color: var(--corErro);
+/* ==================================================================
+   Arquivo original: navegacao/menuHamburguerLogado.css
+   ================================================================== */
+/*
+  Componente: menuHamburguerLogado (desktop)
+  Convertido para o Dropdown nativo do Bootstrap (.dropdown,
+  .dropdown-menu, .dropdown-item, data-bs-toggle="dropdown") — abrir,
+  fechar, clique fora e Esc já vêm prontos via Popper. Aqui só
+  sobrescrevemos as variáveis (--bs-dropdown-*) do Bootstrap.
+*/
+
+.menuHamburguerLogado {
+  --bs-dropdown-min-width: 220px;
+  --bs-dropdown-bg: var(--corDestaque);
+  --bs-dropdown-border-width: 0;
+  --bs-dropdown-border-radius: var(--raioPequeno);
+  --bs-dropdown-box-shadow: 0 4px 12px rgba(7, 18, 10, 0.25);
+  --bs-dropdown-link-color: var(--corBranco);
+  --bs-dropdown-link-hover-color: var(--corLetras);
+  --bs-dropdown-link-hover-bg: var(--corBranco);
+  --bs-dropdown-spacer: var(--espaco2);
+  position: fixed;
+  top: var(--espaco3);
+  right: var(--espaco4);
+  z-index: 950;
+}
+
+.menuHamburguerLogado_botao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--corBranco);
+  cursor: pointer;
+}
+
+.menuHamburguerLogado_item {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco2);
+  font-weight: var(--pesoNegrito);
+}
+
+/* Apenas para a demonstração nesta página */
+.menuHamburguerLogado--demo {
+  position: absolute;
 }
 
 
-@keyframes animacaoEsqueleto {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.estadoCarregando img[data-campo] {
-  background-color: transparent;
-  background-image: linear-gradient(
-    90deg,
-    var(--corEsqueletoClara) 25%,
-    var(--corEsqueletoEscura) 50%,
-    var(--corEsqueletoClara) 75%
-  );
-  background-size: 200% 100%;
-  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
-}
-
-.estadoCarregando [data-campo]:not(img) {
-  color: transparent;
-  border-radius: 4px;
-  background-image: linear-gradient(
-    90deg,
-    var(--corEsqueletoClara) 25%,
-    var(--corEsqueletoEscura) 50%,
-    var(--corEsqueletoClara) 75%
-  );
-  background-size: 200% 100%;
-  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
-}
-
-.estadoCarregando .botaoPrimario {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-
-.estadoErro img[data-campo],
-.estadoErro [data-campo]:not(img) {
-  color: transparent;
-  background-color: var(--corEsqueletoClara);
-  background-image: none;
-  animation: none;
-}

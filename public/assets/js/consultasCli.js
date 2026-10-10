@@ -23,12 +23,12 @@
   };
 
   var moduloConsultasCli = {
+
     configuracao: {
-      urlVerificarSessao: "index.php?uri=cliente", //Axalote
-      urlObterConsultas: "index.php?uri=cliente",
-      urlCancelarConsulta: "index.php?uri=cliente", //Axalote
-      urlLogin: "index.php?uri=login", //Axalote
-      urlCadastro: "index.php?uri=cadastro"
+      urlVerificarSessao: "/backend/verificarSessao.php", //Axalote
+      urlObterConsultas: "app/controllers/Servicocontroller.php",
+      urlCancelarConsulta: "/backend/cancelarConsulta.php", //Axalote
+      urlLogin: "/login/index.html" //Axalote
     },
 
     elementos: {},
@@ -36,7 +36,7 @@
     iniciar: function () {
       this.cachearElementos();
       this.registrarEventos();
-      this.verificarSessaoEBuscarConsultas();
+      //this.verificarSessaoEBuscarConsultas();
     },
 
     cachearElementos: function () {
@@ -76,15 +76,12 @@
       });
     },
 
-    verificarSessaoEBuscarConsultas: function () {
+    /*verificarSessaoEBuscarConsultas: function () {
       var self = this;
 
       $.ajax({
         url: this.configuracao.urlVerificarSessao,
-        method: "POST",
-        data: {
-          acao: "verificarLogin"
-        },
+        method: "GET",
         dataType: "json"
       })
         .done(function (resposta) {
@@ -97,7 +94,7 @@
         .fail(function () {
           self.exibirModalSessaoExpirada();
         });
-    },
+    },*/
 
     exibirModalSessaoExpirada: function () {
       this.elementos.$grade.removeClass("estadoCarregando").attr("hidden", "hidden");
@@ -115,7 +112,7 @@
         method: "POST",
         dataType: "json",
         data: {
-          acao: "MostrarConsulta"
+          acao: "mostrarservico"
         }
       })
         .done(function (resposta) {
@@ -129,7 +126,7 @@
             return;
           }
 
-          var consultas = resposta.dados || [];
+          var consultas = resposta.dados.consultas || [];
           if (!consultas.length) {
             self.exibirEstadoVazio();
             self.anunciar("Nenhuma consulta agendada.");
@@ -163,82 +160,78 @@
       this.elementos.$estadoVazio.removeAttr("hidden");
     },
 
+
     renderizarConsultas: function (consultas) {
-        var self = this;
+      var self = this;
 
-        self.elementos.$grade.empty().removeAttr("hidden");
+      this.elementos.$estadoVazio.attr("hidden", "hidden");
+      this.elementos.$grade.removeAttr("hidden").empty();
 
-        $.each(consultas, function (indice, consulta) {
-            self.elementos.$grade.append(
-            self.construirCartaoConsulta(consulta)
-            );
-        });
+      consultas.forEach(function (consulta) {
+        self.elementos.$grade.append(self.construirCartaoConsulta(consulta));
+      });
 
-        self.inicializarPopovers();
+      this.inicializarPopovers();
     },
+
+    /**
+     * Convenção do objeto "consulta" vindo do PHP:
+     * {
+     *   id: 1,
+     *   nomeServico: "Tratamento de unha encravada",
+     *   dataHora: "17 de junho, 08:00",
+     *   preco: "R$12,50",
+     *   nomeProfissional: "Samanta Santos",
+     *   nomeClinica: "Girasol",
+     *   status: "pendente" | "agendada" | "cancelada"
+     * }
+     */
     construirCartaoConsulta: function (consulta) {
-        var infoStatus = this.obterInfoStatus(consulta.status);
+      var infoStatus = this.obterInfoStatus(consulta.status);
 
-        var $card = $('<article class="cartaoConsulta"></article>')
-            .attr("data-consulta-id", consulta.agnd_id);
+      var $card = $('<article class="cartaoConsulta"></article>').attr(
+        "data-consulta-id",
+        consulta.id
+      );
 
-        $card.append(
-            $("<h2 class=\"tituloConsulta\"></h2>")
-            .text(consulta.ser_nome)
+      $card.append($("<h2 class=\"tituloConsulta\"></h2>").text(consulta.nomeServico));
+
+      var $linha = $('<div class="linhaConsulta d-flex justify-content-between"></div>');
+      $linha.append($("<p class=\"dataHoraConsulta\"></p>").text(consulta.dataHora));
+      $linha.append($("<p class=\"precoConsulta\"></p>").text(consulta.preco));
+      $card.append($linha);
+
+      $card.append(
+        $("<p class=\"profissionalConsulta\"></p>")
+          .append("<strong>Profissional:</strong> ")
+          .append(document.createTextNode(consulta.nomeProfissional))
+      );
+      $card.append(
+        $("<p class=\"clinicaConsulta\"></p>")
+          .append("<strong>Clínica:</strong> ")
+          .append(document.createTextNode(consulta.nomeClinica))
+      );
+
+      var $rodape = $(
+        '<div class="rodapeConsulta d-flex justify-content-between align-items-center"></div>'
+      );
+
+      if (consulta.status !== "cancelada") {
+        $rodape.append(
+          $(
+            '<button type="button" class="botaoCancelarConsulta botaoCancelar btn rounded-pill"></button>'
+          )
+            .attr("data-consulta-id", consulta.id)
+            .attr("data-nome-servico", consulta.nomeServico)
+            .append('<span class="material-symbols-outlined" aria-hidden="true">cancel</span> Cancelar')
         );
+      }
 
-        var dataHora =
-            consulta.agnd_dt +
-            " - " +
-            consulta.agnd_hrIni +
-            " às " +
-            consulta.agnd_hrTerm;
+      $rodape.append(this.construirBadgeStatus(infoStatus));
+      $card.append($rodape);
 
-        var $linha = $(
-            '<div class="linhaConsulta d-flex justify-content-between"></div>'
-        );
-
-        $linha.append(
-            $("<p class=\"dataHoraConsulta\"></p>")
-            .text(dataHora)
-        );
-
-        $card.append($linha);
-
-        $card.append(
-            $("<p class=\"profissionalConsulta\"></p>")
-            .append("<strong>Profissional:</strong> ")
-            .append(document.createTextNode(consulta.pro_nome))
-        );
-
-        $card.append(
-            $("<p class=\"clinicaConsulta\"></p>")
-            .append("<strong>Clínica:</strong> ")
-            .append(document.createTextNode(consulta.clin_nome))
-        );
-
-        var $rodape = $(
-            '<div class="rodapeConsulta d-flex justify-content-between align-items-center"></div>'
-        );
-
-        if (consulta.status !== "cancelada") {
-            $rodape.append(
-            $(
-                '<button type="button" class="botaoCancelarConsulta botaoCancelar btn rounded-pill"></button>'
-            )
-                .attr("data-consulta-id", consulta.agnd_id)
-                .attr("data-nome-servico", consulta.ser_nome)
-                .append(
-                '<span class="material-symbols-outlined" aria-hidden="true">cancel</span> Cancelar'
-                )
-            );
-        }
-
-        $rodape.append(this.construirBadgeStatus(infoStatus));
-        $card.append($rodape);
-
-        return $card;
-        },
+      return $card;
+    },
 
     obterInfoStatus: function (status) {
       return INFORMACOES_STATUS[status] || INFORMACOES_STATUS.pendente;

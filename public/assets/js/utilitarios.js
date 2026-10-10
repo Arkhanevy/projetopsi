@@ -206,6 +206,139 @@
       this.mostrarAlerta($container, mensagem, "danger");
     },
 
+    /**
+     * VALIDAÇÃO AO SAIR DO CAMPO.
+     * "regras" é uma lista de { $campo, valido: function (valor), mensagem }.
+     * Quando o usuário sai do campo (blur) com um valor preenchido que a
+     * regra considera inválido, o campo é marcado com "is-invalid" e o
+     * alerta é exibido (mesmo padrão já usado no CEP). Campo vazio é
+     * ignorado aqui — a obrigatoriedade continua sendo checada no envio.
+     * Este helper só avisa; a validação no envio e no servidor permanece.
+     */
+    validarAoSair: function ($container, regras) {
+      var self = this;
+
+      regras.forEach(function (regra) {
+        regra.$campo.on("blur", function () {
+          var valor = $.trim(regra.$campo.val());
+
+          if (valor === "" || regra.valido(valor)) {
+            regra.$campo.removeClass("is-invalid").removeAttr("aria-invalid");
+            return;
+          }
+
+          regra.$campo.addClass("is-invalid").attr("aria-invalid", "true");
+
+          // Evita alerta repetido (ex.: o mesmo aviso do envio logo em seguida).
+          var jaExibido = $container.find(".alert").filter(function () {
+            return $.trim($(this).text()) === regra.mensagem;
+          }).length > 0;
+
+          if (!jaExibido) {
+            self.mostrarAlerta($container, regra.mensagem, "danger");
+          }
+        });
+
+        regra.$campo.on("input change", function () {
+          regra.$campo.removeAttr("aria-invalid");
+        });
+      });
+    },
+
+    /**
+     * MÁSCARAS DE DIGITAÇÃO (telefone, CPF, CNPJ e CEP).
+     * Basta marcar o campo no HTML com data-mascara="telefone|cpf|cnpj|cep".
+     * O valor exibido ganha pontuação enquanto o usuário digita; o usuário
+     * nunca precisa digitar os símbolos. A pontuação é só visual: validação
+     * e envio continuam usando apenasNumeros(), então o backend recebe só
+     * dígitos, como antes.
+     */
+    formatarMascara: function (tipo, valor) {
+      var d = this.apenasNumeros(valor || "");
+      var f = "";
+
+      if (tipo === "telefone") {
+        // Autopreenchimento pode trazer o código do país (+55).
+        if (d.length > 11 && d.indexOf("55") === 0) d = d.substring(2);
+        d = d.substring(0, 11);
+        if (d.length === 0) return "";
+        f = "(" + d.substring(0, 2);
+        if (d.length > 2) {
+          var resto = d.substring(2);
+          var corte = resto.length > 8 ? 5 : 4; // 11 dígitos: 9XXXX-XXXX; 10: XXXX-XXXX
+          f += ") " + resto.substring(0, corte);
+          if (resto.length > corte) f += "-" + resto.substring(corte);
+        }
+        return f;
+      }
+
+      if (tipo === "cpf") {
+        d = d.substring(0, 11);
+        f = d.substring(0, 3);
+        if (d.length > 3) f += "." + d.substring(3, 6);
+        if (d.length > 6) f += "." + d.substring(6, 9);
+        if (d.length > 9) f += "-" + d.substring(9);
+        return f;
+      }
+
+      if (tipo === "cnpj") {
+        d = d.substring(0, 14);
+        f = d.substring(0, 2);
+        if (d.length > 2) f += "." + d.substring(2, 5);
+        if (d.length > 5) f += "." + d.substring(5, 8);
+        if (d.length > 8) f += "/" + d.substring(8, 12);
+        if (d.length > 12) f += "-" + d.substring(12);
+        return f;
+      }
+
+      if (tipo === "cep") {
+        d = d.substring(0, 8);
+        f = d.substring(0, 5);
+        if (d.length > 5) f += "-" + d.substring(5);
+        return f;
+      }
+
+      return valor;
+    },
+
+    aplicarMascaras: function () {
+      var self = this;
+
+      function formatarCampo(campo) {
+        var tipo = campo.getAttribute("data-mascara");
+        var antes = campo.value;
+        var depois = self.formatarMascara(tipo, antes);
+        if (antes === depois) return;
+
+        // Mantém o cursor depois do mesmo dígito, mesmo editando no meio.
+        var cursor = campo.selectionStart;
+        var digitosAntesDoCursor = (cursor === null || cursor === undefined)
+          ? null
+          : self.apenasNumeros(antes.substring(0, cursor)).length;
+
+        campo.value = depois;
+
+        if (digitosAntesDoCursor !== null && document.activeElement === campo) {
+          var contados = 0;
+          var posicao = 0;
+          while (posicao < depois.length && contados < digitosAntesDoCursor) {
+            if (/\d/.test(depois.charAt(posicao))) contados++;
+            posicao++;
+          }
+          campo.setSelectionRange(posicao, posicao);
+        }
+      }
+
+      $(document).on("input change", "[data-mascara]", function () {
+        formatarCampo(this);
+      });
+
+      // Formata valores que já estejam no campo ao carregar (ex.: autopreenchimento).
+      $("[data-mascara]").each(function () {
+        formatarCampo(this);
+      });
+    },
+
     cpfValido: function (cpf) {
       cpf = cpf.replace(/\D/g, "");
 
@@ -341,5 +474,9 @@
   };
 
   window.ElmoUtilitarios = ElmoUtilitarios;
+
+  $(function () {
+    ElmoUtilitarios.aplicarMascaras();
+  });
 
 })(jQuery, window);

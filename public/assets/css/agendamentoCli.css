@@ -1,19 +1,54 @@
 /* ============================================================
    PÁGINA: agendamentoCli (Agendamento)
-   Depende de: /site/assets/css/variaveis.css
-              /site/assets/css/componentes.css
+   Depende de: public/assets/css/variaveis.css
+              public/assets/css/componentes.css
    (ambos devem ser carregados antes deste arquivo)
 
-   Este arquivo contém SOMENTE o que é específico desta página:
-   grid do formulário, calendário customizado e dropdowns.
-   Navegação, botões e modal padrão estão em componentes.css.
+   O calendário e os dropdowns customizados (.diaCalendario,
+   .dropdownCustomizado*) são gerados/controlados por
+   agendamentoCli.js — mantidos como estão, com as novas
+   variáveis, em vez de migrados para calendarioBase/campoSelect
+   do design system, para não arriscar a lógica de agendamento.
+   Navegação, modal e botões primário/secundário vêm de
+   componentes.css (navLateralLogado, navInferiorLogado,
+   modalBase, botaoBase).
    ============================================================ */
 
+.conteudoAgendamento {
+  padding-top: calc(72px + var(--espaco4));
+  padding-bottom: calc(64px + var(--espaco4));
+  padding-left: var(--espaco4);
+  padding-right: var(--espaco4);
+}
+
+@media (min-width: 768px) {
+  .conteudoAgendamento {
+    margin-left: 72px;
+    padding-top: var(--espaco5);
+    padding-bottom: var(--espaco5);
+  }
+}
+
+.botaoVoltarAgendamento {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--corDestaque);
+  background-color: transparent;
+  color: var(--corDestaque);
+  margin-bottom: var(--espaco5);
+}
+
+.botaoVoltarAgendamento:hover {
+  background-color: var(--corBotoes);
+}
 
 .gradeAgendamento {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--espacamentoLg);
+  gap: var(--espaco5);
   max-width: 1200px;
   margin: 0 auto;
   grid-template-areas:
@@ -53,52 +88,50 @@
 
 .tituloAgendamento {
   margin: 0;
-  font-weight: 700;
 }
 
 .campoValorLinha {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--espacamentoMd);
+  gap: var(--espaco4);
 }
 
 .valorAgendamento {
   margin: 0;
-  padding: var(--espacamentoXs) var(--espacamentoMd);
-  border: 1px solid var(--corBorda);
+  padding: var(--espaco1) var(--espaco4);
+  border: 1px solid var(--corBordas);
   border-radius: 8px;
   background-color: var(--corBranco);
-  font-weight: 700;
+  font-weight: var(--pesoNegrito);
 }
 
 .textoAjuda {
-  margin: var(--espacamentoXs) 0 0 0;
-  font-size: var(--fonteTamanhoCaption);
-  font-weight: 700;
+  margin: var(--espaco1) 0 0 0;
+  font-size: var(--tamanhoCaption);
+  font-weight: var(--pesoNegrito);
 }
 
 .campoFormulario {
   display: flex;
   flex-direction: column;
-  gap: var(--espacamentoXs);
+  gap: var(--espaco1);
 }
 
 .tituloCampo {
   display: block;
-  font-size: var(--fonteTamanhoH3);
-  font-weight: 700;
-  margin: 0 0 var(--espacamentoXs) 0;
+  font-size: var(--tamanhoH3);
+  margin: 0 0 var(--espaco1) 0;
 }
 
 .inputFormulario {
   width: 100%;
-  padding: var(--espacamentoSm) var(--espacamentoMd);
-  border: 1px solid var(--corBorda);
+  padding: var(--espaco2) var(--espaco4);
+  border: 1px solid var(--corBordas);
   border-radius: 8px;
   background-color: var(--corBranco);
-  color: var(--corTexto);
-  font-size: var(--fonteTamanhoBody);
+  color: var(--corLetras);
+  font-size: var(--tamanhoBody);
 }
 
 .inputFormulario[readonly] {
@@ -114,13 +147,13 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--espacamentoSm);
-  padding: var(--espacamentoSm) var(--espacamentoMd);
-  border: 1px solid var(--corBorda);
+  gap: var(--espaco2);
+  padding: var(--espaco2) var(--espaco4);
+  border: 1px solid var(--corBordas);
   border-radius: 8px;
   background-color: var(--corBranco);
-  color: var(--corTexto);
-  font-size: var(--fonteTamanhoBody);
+  color: var(--corLetras);
+  font-size: var(--tamanhoBody);
   cursor: pointer;
 }
 
@@ -147,16 +180,16 @@
 
 .dropdownCustomizadoLista {
   position: absolute;
-  top: calc(100% + var(--espacamentoXs));
+  top: calc(100% + var(--espaco1));
   left: 0;
   right: 0;
   z-index: 20;
   max-height: 240px;
   overflow-y: auto;
   margin: 0;
-  padding: var(--espacamentoXs) 0;
+  padding: var(--espaco1) 0;
   list-style: none;
-  border: 1px solid var(--corBorda);
+  border: 1px solid var(--corBordas);
   border-radius: 8px;
   background-color: var(--corBranco);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -170,13 +203,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--espacamentoSm);
+  gap: var(--espaco2);
   width: 100%;
-  padding: var(--espacamentoSm) var(--espacamentoMd);
+  padding: var(--espaco2) var(--espaco4);
   border: none;
   background-color: transparent;
-  color: var(--corTexto);
-  font-size: var(--fonteTamanhoBody);
+  color: var(--corLetras);
+  font-size: var(--tamanhoBody);
   text-align: left;
   cursor: pointer;
 }
@@ -187,12 +220,11 @@
 }
 
 .calendarioAgendamento {
-  padding: var(--espacamentoMd);
-  border: 1px solid var(--corBorda);
+  padding: var(--espaco4);
+  border: 1px solid var(--corBordas);
   border-radius: 12px;
   background-color: var(--corBranco);
 }
-
 
 .calendarioAgendamento.campoComErro {
   color: inherit;
@@ -202,8 +234,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--espacamentoMd);
-  margin-bottom: var(--espacamentoMd);
+  gap: var(--espaco4);
+  margin-bottom: var(--espaco4);
 }
 
 .calendarioBotaoNavegacao {
@@ -220,15 +252,14 @@
 }
 
 .calendarioBotaoNavegacao:hover {
-  background-color: var(--corBotaoPrincipal);
+  background-color: var(--corBotoes);
   color: var(--corBranco);
 }
 
 .calendarioTitulo {
   min-width: 140px;
   margin: 0;
-  font-size: var(--fonteTamanhoH3);
-  font-weight: 700;
+  font-size: var(--tamanhoH3);
   text-align: center;
   text-transform: uppercase;
 }
@@ -236,17 +267,17 @@
 .calendarioDiasSemana {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: var(--espacamentoXs);
-  margin-bottom: var(--espacamentoSm);
-  font-weight: 700;
+  gap: var(--espaco1);
+  margin-bottom: var(--espaco2);
+  font-weight: var(--pesoNegrito);
   text-align: center;
 }
 
 .calendarioGrade {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: var(--espacamentoXs);
-  margin-bottom: var(--espacamentoMd);
+  gap: var(--espaco1);
+  margin-bottom: var(--espaco4);
 }
 
 .diaCalendario {
@@ -257,9 +288,9 @@
   border: 2px solid transparent;
   border-radius: 8px;
   background-color: transparent;
-  color: var(--corTexto);
-  font-size: var(--fonteTamanhoBody);
-  font-weight: 700;
+  color: var(--corLetras);
+  font-size: var(--tamanhoBody);
+  font-weight: var(--pesoNegrito);
   cursor: pointer;
 }
 
@@ -269,21 +300,21 @@
 }
 
 .diaCalendario.diaIndisponivel {
-  border-color: var(--corErro);
-  color: var(--corErro);
+  border-color: var(--corAcaoNegativa);
+  color: var(--corAcaoNegativa);
   cursor: not-allowed;
 }
 
 .diaCalendario.diaSelecionado {
-  background-color: var(--corBotaoSecundario);
-  border-color: var(--corBotaoSecundario);
+  background-color: var(--corAcaoSecundaria);
+  border-color: var(--corAcaoSecundaria);
   color: var(--corBranco);
 }
 
 
 @media (max-width: 400px) {
   .calendarioAgendamento {
-    padding: var(--espacamentoSm);
+    padding: var(--espaco2);
   }
 
   .calendarioGrade,
@@ -295,16 +326,16 @@
 .calendarioLegenda {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--espacamentoMd);
+  gap: var(--espaco4);
 }
 
 .legendaItem {
   display: flex;
   align-items: center;
-  gap: var(--espacamentoXs);
+  gap: var(--espaco1);
   margin: 0;
-  font-size: var(--fonteTamanhoSmall);
-  font-weight: 700;
+  font-size: var(--tamanhoSmall);
+  font-weight: var(--pesoNegrito);
 }
 
 .legendaAmostra {
@@ -315,11 +346,11 @@
 }
 
 .legendaAmostraSelecionado {
-  background-color: var(--corBotaoSecundario);
+  background-color: var(--corAcaoSecundaria);
 }
 
 .legendaAmostraIndisponivel {
-  border: 2px solid var(--corErro);
+  border: 2px solid var(--corAcaoNegativa);
   background-color: transparent;
 }
 
@@ -327,11 +358,63 @@
 .acoesFormulario {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--espacamentoMd);
+  gap: var(--espaco4);
 }
 
 @media (min-width: 768px) {
   .acoesFormulario {
     justify-content: flex-end;
   }
+}
+
+/* ---------- Campo com erro de validação ---------- */
+
+.campoComErro {
+  border-color: var(--corAcaoNegativa) !important;
+  color: var(--corAcaoNegativa);
+}
+
+/* ---------- Estado de carregamento (skeleton) e erro ---------- */
+
+@keyframes animacaoEsqueleto {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.estadoCarregando img[data-campo] {
+  background-color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    var(--corFundoClaro) 25%,
+    var(--corFundo) 50%,
+    var(--corFundoClaro) 75%
+  );
+  background-size: 200% 100%;
+  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
+}
+
+.estadoCarregando [data-campo]:not(img) {
+  color: transparent;
+  border-radius: 4px;
+  background-image: linear-gradient(
+    90deg,
+    var(--corFundoClaro) 25%,
+    var(--corFundo) 50%,
+    var(--corFundoClaro) 75%
+  );
+  background-size: 200% 100%;
+  animation: animacaoEsqueleto 1.5s ease-in-out infinite;
+}
+
+.estadoCarregando .botaoBase--primario {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.estadoErro img[data-campo],
+.estadoErro [data-campo]:not(img) {
+  color: transparent;
+  background-color: var(--corFundoClaro);
+  background-image: none;
+  animation: none;
 }

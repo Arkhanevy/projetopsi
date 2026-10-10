@@ -1,131 +1,158 @@
-document.addEventListener("DOMContentLoaded", function () {
+(function ($, Utilitarios) {
+  "use strict";
 
-    const Utilitarios = window.ElmoUtilitarios;
+  var moduloInfoServico = {
 
-    //Configurações
-    const configuracao = {
-        urlObterServico: "index.php?uri=servico"
-    };
+    configuracao: {
+      urlObterServico: "index.php?uri=servico"
+    },
 
-    let idServico = 1; // Axalote Utilitarios.obterParametroUrl("id");
+    estado: {
+      idServico: null
+    },
+    elementos: {},
 
-    //Elementos
-    const elementos = {
-        botaoAgendarAgora: $("#botaoAgendarAgora"),
-        botaoTentarNovamente: $("#botaoTentarNovamente"),
-        modalErro: $("#modalServicoNaoEncontrado"),
-        modalSucesso: $("#modalAgendamentoEnviado"),
-        camposDinamicos: $("[data-campo]"),
-        cartaoServico: $("#cartaoServico")
-    };
+    iniciar: function () {
+      this.elementos.$botaoAgendarAgora = $("#botaoAgendarAgora");
+      this.elementos.$botaoTentarNovamente = $("#botaoTentarNovamente");
+      this.elementos.$modalErro = $("#modalServicoNaoEncontrado");
+      this.elementos.$modalSucesso = $("#modalAgendamentoEnviado");
+      this.elementos.$camposDinamicos = $("[data-campo]");
+      this.elementos.$cartaoServico = $("#cartaoServico");
 
-    //FUNÇÕES
+      this.estado.idServico = 1; // Axalote Utilitarios.obterParametroUrl("id");
 
-    function mapearDadosServico(registro) {
-        return {
-            tituloServico: registro.ser_nome,
-            descricaoServico: registro.ser_desc,
-            duracaoServico: registro.ser_dur ? registro.ser_dur + " min" : "",
-            precoServico: formatarPreco(registro.ser_val)
-        };
-    }
+      this.registrarEventos();
+      this.buscarDadosServico();
+    },
 
-    function formatarPreco(valor) {
-        const numero = Number(valor);
-        if (isNaN(numero)) return "";
-        return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    }
+    registrarEventos: function () {
+      var self = this;
 
-    function habilitarBotaoAgendar() {
-        elementos.botaoAgendarAgora.prop("disabled", false).attr("aria-disabled", "false");
-    }
+      this.elementos.$botaoTentarNovamente.on("click", function () {
+        self.buscarDadosServico();
+      });
 
-    function desabilitarBotaoAgendar() {
-        elementos.botaoAgendarAgora.prop("disabled", true).attr("aria-disabled", "true");
-    }
-
-    function exibirModalErro() {
-        desabilitarBotaoAgendar();
-        Utilitarios.exibirModal(elementos.modalErro, { backdrop: "static", keyboard: false });
-    }
-
-    function tratarFalhaCarregamento() {
-        elementos.cartaoServico.removeClass("estadoCarregando").addClass("estadoErro");
-        Utilitarios.alternarEsqueletoAcessivel(elementos.camposDinamicos, true);
-        exibirModalErro();
-    }
-
-    function exibirModalSucessoSeAgendado() {
-        const parametros = new URLSearchParams(window.location.search);
-        if (parametros.get("agendado") !== "1") return;
-
-        Utilitarios.exibirModal(elementos.modalSucesso);
-
-        parametros.delete("agendado");
-        const novaQuerystring = parametros.toString();
-        const novaUrl = window.location.pathname + (novaQuerystring ? "?" + novaQuerystring : "");
-        window.history.replaceState({}, document.title, novaUrl);
-    }
-
-    function irParaAgendamento() {
-        let url = "index.php?uri=agendamentoCli";
-        if (idServico) {
-            url += "&servico=" + encodeURIComponent(idServico);
-        }
-        window.location.href = url;
-    }
-
-    function buscarDadosServico() {
-        Utilitarios.esconderModal(elementos.modalErro);
-        desabilitarBotaoAgendar();
-        elementos.cartaoServico.removeClass("estadoErro").addClass("estadoCarregando");
-        Utilitarios.alternarEsqueletoAcessivel(elementos.camposDinamicos, true);
-
-        $.ajax({
-            url: configuracao.urlObterServico,
-            method: "POST",
-            dataType: "json",
-            data: {
-                acao: "mostrardetalhes",
-                ser_id: idServico
-            },
-            success: function (resposta) {
-                if (!resposta || !resposta.sucesso || !resposta.dados || !resposta.dados.length) {
-                    tratarFalhaCarregamento();
-                    return;
-                }
-
-                elementos.cartaoServico.removeClass("estadoCarregando estadoErro");
-                Utilitarios.preencherCampos(
-                    elementos.camposDinamicos,
-                    mapearDadosServico(resposta.dados[0])
-                );
-                Utilitarios.alternarEsqueletoAcessivel(elementos.camposDinamicos, false);
-                habilitarBotaoAgendar();
-                exibirModalSucessoSeAgendado();
-            },
-            error: function () {
-                tratarFalhaCarregamento();
-            }
-        });
-    }
-
-    //EVENTOS
-
-    elementos.botaoTentarNovamente.on("click", function () {
-        buscarDadosServico();
-    });
-
-    elementos.botaoAgendarAgora.on("click", function (evento) {
+      this.elementos.$botaoAgendarAgora.on("click", function (evento) {
         evento.preventDefault();
-        irParaAgendamento();
-    });
+        self.irParaAgendamento();
+      });
 
-    elementos.modalErro.on("shown.bs.modal", function () {
-        elementos.botaoTentarNovamente.trigger("focus");
-    });
+      this.elementos.$modalErro.on("shown.bs.modal", function () {
+        self.elementos.$botaoTentarNovamente.trigger("focus");
+      });
+    },
 
-    //INICIALIZAÇÃO
-    buscarDadosServico();
+    buscarDadosServico: function () {
+      var self = this;
 
-});
+      Utilitarios.esconderModal(this.elementos.$modalErro);
+      this.desabilitarBotaoAgendar();
+      this.elementos.$cartaoServico
+        .removeClass("estadoErro")
+        .addClass("estadoCarregando");
+      Utilitarios.alternarEsqueletoAcessivel(this.elementos.$camposDinamicos, true);
+
+      $.ajax({
+        url: this.configuracao.urlObterServico,
+        method: "POST",
+        dataType: "json",
+        data: {
+          acao: "mostrardetalhes",
+          ser_id: this.estado.idServico
+        }
+      })
+        .done(function (resposta) {
+          if (!resposta || !resposta.sucesso || !resposta.dados || !resposta.dados.length) {
+            self.tratarFalhaCarregamento();
+            return;
+          }
+          self.elementos.$cartaoServico.removeClass("estadoCarregando estadoErro");
+          Utilitarios.preencherCampos(
+            self.elementos.$camposDinamicos,
+            self.mapearDadosServico(resposta.dados[0])
+          );
+          Utilitarios.alternarEsqueletoAcessivel(self.elementos.$camposDinamicos, false);
+          self.habilitarBotaoAgendar();
+          self.exibirModalSucessoSeAgendado();
+        })
+        .fail(function () {
+          self.tratarFalhaCarregamento();
+        });
+    },
+
+    mapearDadosServico: function (registro) {
+      return {
+        tituloServico: registro.ser_nome,
+        descricaoServico: registro.ser_desc,
+        duracaoServico: registro.ser_dur ? registro.ser_dur + " min" : "",
+        precoServico: this.formatarPreco(registro.ser_val)
+      };
+    },
+
+    formatarPreco: function (valor) {
+      var numero = Number(valor);
+      if (isNaN(numero)) {
+        return "";
+      }
+      return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    },
+
+    tratarFalhaCarregamento: function () {
+      this.elementos.$cartaoServico
+        .removeClass("estadoCarregando")
+        .addClass("estadoErro");
+      Utilitarios.alternarEsqueletoAcessivel(this.elementos.$camposDinamicos, true);
+      this.exibirModalErro();
+    },
+
+    exibirModalSucessoSeAgendado: function () {
+      var parametros = new URLSearchParams(window.location.search);
+
+      if (parametros.get("agendado") !== "1") {
+        return;
+      }
+
+      Utilitarios.exibirModal(this.elementos.$modalSucesso);
+
+      parametros.delete("agendado");
+      var novaQuerystring = parametros.toString();
+      var novaUrl =
+        window.location.pathname + (novaQuerystring ? "?" + novaQuerystring : "");
+      window.history.replaceState({}, document.title, novaUrl);
+    },
+
+    exibirModalErro: function () {
+      this.desabilitarBotaoAgendar();
+      Utilitarios.exibirModal(this.elementos.$modalErro, {
+        backdrop: "static",
+        keyboard: false
+      });
+    },
+
+    habilitarBotaoAgendar: function () {
+      this.elementos.$botaoAgendarAgora
+        .prop("disabled", false)
+        .attr("aria-disabled", "false");
+    },
+
+    desabilitarBotaoAgendar: function () {
+      this.elementos.$botaoAgendarAgora
+        .prop("disabled", true)
+        .attr("aria-disabled", "true");
+    },
+
+    irParaAgendamento: function () {
+      var url = "index.php?uri=agendamentoCli";
+      if (this.estado.idServico) {
+        url += "&servico=" + encodeURIComponent(this.estado.idServico);
+      }
+      window.location.href = url; 
+    }
+  };
+
+  $(function () {
+    moduloInfoServico.iniciar();
+  });
+
+})(jQuery, window.ElmoUtilitarios);

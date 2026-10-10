@@ -1,21 +1,41 @@
 /* ============================================================
    PÁGINA: consultasCli (Minhas consultas)
-   Depende de: /site/assets/css/variaveis.css
-              /site/assets/css/componentes.css
+   Depende de: public/assets/css/variaveis.css
+              public/assets/css/componentes.css
    (ambos devem ser carregados antes deste arquivo)
+
+   As classes abaixo (cartaoConsulta, badgeStatus e variantes,
+   botaoCancelar) são geradas dinamicamente por consultasCli.js —
+   não renomear sem atualizar o JS.
    ============================================================ */
 
+.conteudoConsultas {
+  padding-top: calc(72px + var(--espaco4));
+  padding-bottom: calc(64px + var(--espaco4));
+  padding-left: var(--espaco4);
+  padding-right: var(--espaco4);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .conteudoConsultas {
+    margin-left: 72px;
+    padding-top: var(--espaco5);
+    padding-bottom: var(--espaco5);
+  }
+}
+
 .tituloConsultas {
-  margin: 0 0 var(--espacamentoLg) 0;
-  padding-bottom: var(--espacamentoMd);
-  border-bottom: 1px solid var(--corBorda);
-  font-weight: 700;
+  margin: 0 0 var(--espaco5) 0;
+  padding-bottom: var(--espaco4);
+  border-bottom: 1px solid var(--corBordas);
 }
 
 .gradeConsultas {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--espacamentoLg);
+  gap: var(--espaco5);
 }
 
 @media (min-width: 768px) {
@@ -29,22 +49,21 @@
 .cartaoConsulta {
   display: flex;
   flex-direction: column;
-  gap: var(--espacamentoSm);
-  padding: var(--espacamentoLg);
-  border: 1px solid var(--corBorda);
+  gap: var(--espaco2);
+  padding: var(--espaco5);
+  border: 1px solid var(--corBordas);
   border-radius: 12px;
   background-color: var(--corBranco);
 }
 
 .tituloConsulta {
   margin: 0;
-  font-size: var(--fonteTamanhoH3);
-  font-weight: 700;
+  font-size: var(--tamanhoH3);
   text-align: center;
 }
 
 .linhaConsulta {
-  font-weight: 700;
+  font-weight: var(--pesoNegrito);
 }
 
 .profissionalConsulta,
@@ -53,27 +72,50 @@
 }
 
 .rodapeConsulta {
-  margin-top: var(--espacamentoSm);
+  margin-top: var(--espaco2);
   flex-wrap: wrap;
-  gap: var(--espacamentoSm);
+  gap: var(--espaco2);
+}
+
+/* Botão de cancelar consulta — usado tanto no card gerado por
+   consultasCli.js (.botaoCancelarConsulta) quanto no modal de
+   confirmação (#botaoConfirmarCancelamento). Não renomear. */
+.botaoCancelar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco1);
+  background-color: var(--corAcaoNegativa);
+  color: var(--corBranco);
+  border: none;
+  border-radius: var(--raioTotal);
+  font-weight: var(--pesoNegrito);
+  font-size: var(--tamanhoBody);
+  padding: var(--espaco2) var(--espaco6);
+  opacity: 0.85;
+}
+
+.botaoCancelar:hover {
+  opacity: 1;
+  color: var(--corBranco);
 }
 
 
 .badgeStatus {
   display: inline-flex;
   align-items: center;
-  gap: var(--espacamentoXs);
+  gap: var(--espaco1);
   border: none;
-  font-weight: 700;
-  font-size: var(--fonteTamanhoBody);
-  padding: var(--espacamentoSm) var(--espacamentoXl);
+  font-weight: var(--pesoNegrito);
+  font-size: var(--tamanhoBody);
+  padding: var(--espaco2) var(--espaco6);
   color: var(--corBranco);
   cursor: pointer;
 }
 
 .badgeStatusPendente {
-  background-color: var(--corStatusPendencia);
-  color: var(--corTexto);
+  background-color: var(--corAcaoAtencao);
+  color: var(--corLetras);
 }
 
 .badgeStatusAgendada {
@@ -81,10 +123,15 @@
 }
 
 .badgeStatusCancelada {
-  background-color: var(--corErro);
+  background-color: var(--corAcaoNegativa);
   opacity: 0.85;
 }
 
+
+@keyframes animacaoEsqueleto {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 .cartaoConsultaEsqueleto .tituloConsulta,
 .cartaoConsultaEsqueleto .dataHoraConsulta,
@@ -97,9 +144,9 @@
   border-radius: 4px;
   background-image: linear-gradient(
     90deg,
-    #C5EED3 25%,
-    #DFF7E6 50%,
-    #C5EED3 75%
+    var(--corFundoClaro) 25%,
+    var(--corFundo) 50%,
+    var(--corFundoClaro) 75%
   );
   background-size: 200% 100%;
   animation: animacaoEsqueleto 1.5s ease-in-out infinite;
@@ -107,28 +154,28 @@
 
 
 .estadoVazioConsultas {
-  padding: var(--espacamentoXl) var(--espacamentoMd);
+  padding: var(--espaco6) var(--espaco4);
   text-align: center;
 }
 
 .iconeEstadoVazio {
   font-size: 96px;
-  color: var(--corBorda);
+  color: var(--corBordas);
 }
 
 .textoEstadoVazio {
-  margin-top: var(--espacamentoMd);
-  font-size: var(--fonteTamanhoBody);
+  margin-top: var(--espaco4);
+  font-size: var(--tamanhoBody);
 }
 
 
-.acoesModalConfirmacao .botaoSecundario,
+.acoesModalConfirmacao .botaoBase,
 .acoesModalConfirmacao .botaoCancelar {
   width: 100%;
 }
 
 @media (min-width: 576px) {
-  .acoesModalConfirmacao .botaoSecundario,
+  .acoesModalConfirmacao .botaoBase,
   .acoesModalConfirmacao .botaoCancelar {
     width: auto;
   }
