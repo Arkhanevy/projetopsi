@@ -1,12 +1,6 @@
 /* ==================================================================
    Arquivo original: botao/botao.js
    ================================================================== */
-/* 
-  Componente: botaoBase
-  Não implementa regras de negócio (regra 17) — apenas dispara um
-  evento customizado "botaoAcionado" que outros módulos (cards.js,
-  modal.js, filtro.js etc.) podem escutar para decidir o que fazer.
-*/
 
 $(function () {
   $(document).on("click", ".botaoBase", function (evento) {
@@ -30,12 +24,6 @@ $(function () {
 /* ==================================================================
    Arquivo original: status/status.js
    ================================================================== */
-/*
-  Componente: indicadorStatus
-  Não é clicável — o único comportamento é permitir que outros módulos
-  (ex.: ao receber uma atualização do Back-End) troquem o estado visual
-  de um indicador já renderizado, sem duplicar HTML.
-*/
 
 function atualizarIndicadorStatus($elemento, novoEstado) {
   const estadosValidos = ["agendada", "confirmada", "pendente", "cancelada", "realizada"];
@@ -57,15 +45,6 @@ function atualizarIndicadorStatus($elemento, novoEstado) {
 /* ==================================================================
    Arquivo original: campo/campo.js
    ================================================================== */
-/*
-  Componentes: campoTexto, campoPesquisa, campoSelect
-  Com a conversão para Bootstrap, o floating label (campoTexto) e o
-  abrir/fechar do dropdown (campoSelect) já são nativos do Bootstrap
-  — não precisam mais de JS próprio. Este arquivo cuida só do que o
-  Bootstrap não resolve sozinho: disparo de pesquisa e atualização do
-  valor exibido/selecionado no campoSelect.
-  Não implementa validação de negócio (regra 17).
-*/
 
 $(function () {
 
@@ -105,11 +84,7 @@ $(function () {
 /* ==================================================================
    Arquivo original: filtro/filtro.js
    ================================================================== */
-/*
-  Componente: painelFiltro
-  Não decide o que fazer com o filtro aplicado (regra 17) — apenas
-  coleta os valores selecionados e dispara um evento customizado.
-*/
+
 
 $(function () {
 
@@ -132,13 +107,6 @@ $(function () {
 /* ==================================================================
    Arquivo original: calendario/calendario.js
    ================================================================== */
-/*
-  Componente: calendarioBase
-  Não decide disponibilidade real (regra 17) — os estados de cada dia
-  (selecionado, indisponível, confirmada, pendente, folga) vêm de fora
-  como dados (ex.: já calculados pelo Back-End) e são apenas exibidos.
-*/
-
 const NOMES_MES = [
   "JAN", "FEV", "MAR", "ABR", "MAI", "JUN",
   "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"
@@ -230,15 +198,6 @@ $(function () {
 /* ==================================================================
    Arquivo original: modal/modal.js
    ================================================================== */
-/*
-  Componente: modalBase
-  Com a conversão para o Modal nativo do Bootstrap, abrir/fechar,
-  overlay, ESC e foco preso já são resolvidos pelo próprio Bootstrap
-  (via data-bs-toggle="modal" / data-bs-dismiss="modal"). Este arquivo
-  fica disponível apenas para ganchos de negócio, como resetar um
-  formulário quando o modal fecha — sem implementar regra de negócio
-  alguma aqui (regra 17).
-*/
 
 $(function () {
 
@@ -258,12 +217,6 @@ $(function () {
 /* ==================================================================
    Arquivo original: cards/cards.js
    ================================================================== */
-/*
-  Comportamento comum aos cards de consulta.
-  Não decide se a ação é permitida (regra 17) — apenas identifica o
-  registro via data-idConsulta e dispara o evento correspondente para
-  quem for integrar com o Back-End.
-*/
 
 $(function () {
 
@@ -298,13 +251,6 @@ $(function () {
 /* ==================================================================
    Arquivo original: navegacao/painelMenuMobile.js
    ================================================================== */
-/*
-  Estrutura-base: painelMenuMobile
-  Com a conversão para o Offcanvas nativo do Bootstrap, abrir/fechar,
-  overlay e Esc já são resolvidos pelo próprio Bootstrap. Este arquivo
-  cuida só de marcar visualmente o item clicado — a navegação real
-  fica a cargo do href/Back-End (regra 17).
-*/
 
 $(function () {
 
@@ -321,13 +267,6 @@ $(function () {
 /* ==================================================================
    Arquivo original: navegacao/menuHamburguerLogado.js
    ================================================================== */
-/*
-  Componente: menuHamburguerLogado (desktop)
-  Com a conversão para o Dropdown nativo do Bootstrap, abrir/fechar,
-  clique fora e Esc já são resolvidos pelo próprio Bootstrap. Este
-  arquivo cuida só da ação "Sair" — não implementa logout (regra 17),
-  apenas dispara o evento para quem for integrar com o Back-End.
-*/
 
 $(function () {
 
@@ -341,13 +280,6 @@ $(function () {
 /* ==================================================================
    Arquivo original: navegacao/navegacao.js
    ================================================================== */
-/*
-  Regra compartilhada entre navLateralLogado e navInferiorLogado:
-  o primeiro item da lista muda de ícone/rótulo conforme o papel do
-  usuário logado. Cliente e profissional/clínica usam a mesma
-  estrutura HTML/CSS — só este dado muda (confirmado: rótulo do
-  profissional/clínica é "Início" tanto no desktop quanto no mobile).
-*/
 
 const ITEM_POR_PAPEL = {
   cliente: { icone: "search", rotulo: "Buscar", acao: "buscar" },

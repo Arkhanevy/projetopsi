@@ -16,21 +16,11 @@
 
   var ElmoUtilitarios = {
 
-    /**
-     * Lê um parâmetro da querystring da página atual.
-     * Ex.: obterParametroUrl("id") em "pagina.html?id=42" -> "42"
-     */
     obterParametroUrl: function (nome) {
       var parametros = new URLSearchParams(window.location.search);
       return parametros.get(nome);
     },
 
-    /**
-     * Bootstrap 5 não possui mais o plugin jQuery ($.fn.modal) que
-     * existia no Bootstrap 4. Estes três helpers centralizam o uso
-     * da API nativa "bootstrap.Modal" para todo o projeto — nenhuma
-     * página deve chamar "$elemento.modal(...)" diretamente.
-     */
     obterInstanciaModal: function ($elementoModal, opcoes) {
       return bootstrap.Modal.getOrCreateInstance($elementoModal.get(0), opcoes);
     },
@@ -45,15 +35,6 @@
         instancia.hide();
       }
     },
-
-    /**
-     * Preenche todos os elementos de "$camposDinamicos" (elementos
-     * com atributo "data-campo") usando os dados recebidos do
-     * backend. Convenção:
-     *   - <img>: usa .attr("src", ...) + "data-campo-alt" para o alt
-     *   - <input>: usa .val()
-     *   - demais elementos: usa .text()
-     */
     preencherCampos: function ($camposDinamicos, dados) {
       $camposDinamicos.each(function () {
         var $elemento = $(this);
@@ -82,13 +63,6 @@
       });
     },
 
-    /**
-     * Enquanto os dados reais não chegam via AJAX (skeleton ativo,
-     * com ou sem erro), o conteúdo visível dos "$camposDinamicos" é
-     * só um exemplo do Figma e não deve ser lido por leitores de
-     * tela. Chamar com "true" ao iniciar o carregamento/erro, e
-     * "false" assim que os dados reais chegarem.
-     */
     alternarEsqueletoAcessivel: function ($camposDinamicos, ativo) {
       if (ativo) {
         $camposDinamicos.attr("aria-hidden", "true");
@@ -97,10 +71,6 @@
       }
     },
 
-    /**
-     * ALERTAS (Bootstrap 5 "alert" dispensável, com autofechamento).
-     * Usado por cadCliente.js, cadClinica.js e cadProfissional.js.
-     */
     mostrarAlerta: function ($container, mensagem, tipo) {
       tipo = tipo || "success";
 
@@ -131,10 +101,6 @@
       return valor.replace(/\D/g, "");
     },
 
-    /**
-     * Aceita telefones fixos (10 dígitos) e celulares (11 dígitos,
-     * com o "9" na frente do número). Valida o DDD (11 a 99).
-     */
     telefoneValido: function (telefone) {
       var numeros = this.apenasNumeros(telefone || "");
 
@@ -148,10 +114,6 @@
       return true;
     },
 
-    /**
-     * Calcula a idade completa (em anos) a partir de uma data de
-     * nascimento no formato "YYYY-MM-DD" (padrão de <input type="date">).
-     */
     calcularIdade: function (dataNascimento) {
       var hoje = new Date();
       var nascimento = new Date(dataNascimento + "T00:00:00");
@@ -165,10 +127,6 @@
       return idade;
     },
 
-    /**
-     * Confere se a data de nascimento informada corresponde a uma
-     * idade igual ou maior que "idadeMinima" (padrão: 18 anos).
-     */
     maiorDeIdade: function (dataNascimento, idadeMinima) {
       idadeMinima = idadeMinima || 18;
 
@@ -179,11 +137,6 @@
       return this.calcularIdade(dataNascimento) >= idadeMinima;
     },
 
-    /**
-     * Recebe uma lista de { valor, el } e marca com "is-invalid"
-     * todo campo cujo valor esteja vazio. Retorna true se algum
-     * campo estiver inválido.
-     */
     validarCampos: function (campos) {
       var erro = false;
       campos.forEach(function (campo) {
@@ -195,10 +148,6 @@
       return erro;
     },
 
-    /**
-     * Marca uma lista de elementos jQuery com "is-invalid" e exibe
-     * um alerta explicando o motivo.
-     */
     marcarCamposComErro: function ($container, campos, mensagem) {
       campos.forEach(function ($campo) {
         $campo.addClass("is-invalid");
@@ -206,15 +155,6 @@
       this.mostrarAlerta($container, mensagem, "danger");
     },
 
-    /**
-     * VALIDAÇÃO AO SAIR DO CAMPO.
-     * "regras" é uma lista de { $campo, valido: function (valor), mensagem }.
-     * Quando o usuário sai do campo (blur) com um valor preenchido que a
-     * regra considera inválido, o campo é marcado com "is-invalid" e o
-     * alerta é exibido (mesmo padrão já usado no CEP). Campo vazio é
-     * ignorado aqui — a obrigatoriedade continua sendo checada no envio.
-     * Este helper só avisa; a validação no envio e no servidor permanece.
-     */
     validarAoSair: function ($container, regras) {
       var self = this;
 
@@ -245,14 +185,6 @@
       });
     },
 
-    /**
-     * MÁSCARAS DE DIGITAÇÃO (telefone, CPF, CNPJ e CEP).
-     * Basta marcar o campo no HTML com data-mascara="telefone|cpf|cnpj|cep".
-     * O valor exibido ganha pontuação enquanto o usuário digita; o usuário
-     * nunca precisa digitar os símbolos. A pontuação é só visual: validação
-     * e envio continuam usando apenasNumeros(), então o backend recebe só
-     * dígitos, como antes.
-     */
     formatarMascara: function (tipo, valor) {
       var d = this.apenasNumeros(valor || "");
       var f = "";
@@ -399,11 +331,6 @@
       return resultado == digitos.charAt(1);
     },
 
-    /**
-     * Liga o clique no preview de imagem ao input de arquivo e
-     * valida que o arquivo escolhido é uma imagem antes de exibir
-     * o preview.
-     */
     configurarPreviewImagem: function ($container, $input, $preview) {
       var self = this;
 
@@ -427,11 +354,6 @@
       });
     },
 
-    /**
-     * Autopreenchimento de endereço a partir do CEP (ViaCEP).
-     * "campos" deve conter os elementos jQuery: cep, rua, bairro,
-     * cidade, uf, ibge.
-     */
     configurarCEP: function ($container, campos) {
       var self = this;
       var todosOsCampos = [campos.cep, campos.rua, campos.bairro, campos.cidade, campos.uf, campos.ibge];
