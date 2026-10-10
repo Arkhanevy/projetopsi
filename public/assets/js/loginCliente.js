@@ -106,7 +106,7 @@ console.log("JS loginCliente carregado");
 
       var fd = new FormData();
       fd.append("email", email);
-      fd.append("senhaLog", el.$loginSenha.val());
+      fd.append("senha", el.$loginSenha.val());
       fd.append("acao", "login");
 
       $.ajax({
